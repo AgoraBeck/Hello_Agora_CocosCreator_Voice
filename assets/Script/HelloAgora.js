@@ -44,10 +44,10 @@ cc.Class({
             type: cc.Button
         },
 
-        localSprite: {
-            default: null,
-            type: cc.Node,
-        },
+        // localSprite: {
+        //     default: null,
+        //     type: cc.Node,
+        // },
 
         //defaults, set visually when attaching this script to the Canvas
         text: 'Hello Agora !',
@@ -56,41 +56,48 @@ cc.Class({
 
     // use this for initialization
     onLoad: function () {        
+
         this.initUI();
-        // this.initEvent();
+
         this.initEvent();
 
         this.label.string = this.text;
         
-       
         cc.log("[onload] end");
     },
 
-
     initUI: function(){
-        // this.updateUI(false);
+
+    },
+
+     // called every frame
+    update: function (dt) {
+
     },
 
     initEvent:function(){      
         var mythis = this;
         var visibleSize = cc.director.getVisibleSize();
-        cc.log("beck 2: " + agoraVideo.AGORAEVT.evt_tips);  
+        
         var self = this;
+
+        if(this instanceof cc._BaseNode)
+            cc.log(" beck 4 ");
+
+    
         cc.eventManager.addListener({
             event: cc.EventListener.CUSTOM,   
             eventName: agoraVideo.AGORAEVT.evt_tips,            
             
             callback: function(event){
-                cc.log(" beck : " + agoraVideo.AGORAEVT.evt_tips);
                 var obj = event.getUserData();
                 var s = obj.msg;
                 if(obj.error != 0){
                     s += "[errorcode]" + obj.error;
                 }
-                cc.log("debug: " + s);
                 self.label.string = s;
             }
-        },this);
+        },this.node);
 
         cc.eventManager.addListener({
             event:cc.EventListener.CUSTOM,
@@ -112,7 +119,7 @@ cc.Class({
                 // node.setPosition(0, 0);
 
             }
-        },this);
+        },this.node);
 
         cc.eventManager.addListener({
             event:cc.EventListener.CUSTOM,
@@ -121,11 +128,11 @@ cc.Class({
                 agoraVideo.addTips("joinChannel Success !")
                 var msg = event.getUserData();
                                                 
-                _remoteVideoSprite.set(msg.uid, agoraVideo.getRemoteSprites(msg.uid));
-                _remoteVideoSprite.get(msg.uid).setPosition(cc.p((visibleSize.width/2 + 330), visibleSize.height/2));
-                mythis.addChild(_remoteVideoSprite.get(msg.uid));
+                // _remoteVideoSprite.set(msg.uid, agoraVideo.getRemoteSprites(msg.uid));
+                // _remoteVideoSprite.get(msg.uid).setPosition(cc.p((visibleSize.width/2 + 330), visibleSize.height/2));
+                // mythis.addChild(_remoteVideoSprite.get(msg.uid));
             }
-        },this);
+        },this.node);
 
     },
 
@@ -174,4 +181,10 @@ cc.Class({
         this.label.string ="正在离开房间...";
         agoraVideo.agoraVideoInst.leaveChannel();
     },  
+
+    btntestClick: function (event, customEventData) {
+        this.label.string ="testing ...";
+        agoraVideo.addTips("加油 ！");
+         cc.log("hasEventListener : " + cc.eventManager.hasEventListener(agoraVideo.AGORAEVT.evt_tips)); 
+    },
 });

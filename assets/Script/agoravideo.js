@@ -13,7 +13,6 @@ var agora_module = {
         
     addTips:function(strTips, errcode)
     {
-        cc.log("[js] addTips : " +  strTips);
         var err = errcode != undefined? errcode: 0;
         var event = new cc.EventCustom(this.AGORAEVT.evt_tips);
         var p = {
@@ -52,7 +51,6 @@ var agora_module = {
     
     initAgoraVide:function(){
 
-        this.addTips("初始化...");  
         if(this.agoraVideoInst == null)
         {
             this.agoraVideoInst = new AgoraVideo();
@@ -63,12 +61,14 @@ var agora_module = {
             this.agoraVideoInst.onJoinChannelSuccess = function(channel,  uid, elapsed){
                 cc.log("[js] onJoinChannelSuccess, channel:%s,uid :%d, elapsed : %d !", channel, uid, elapsed);    
               
-                self.addTips(" Join Channel Success !");
+                self.addTips(" Join Channel Successfully !");
                 self.localNotify(channel,  uid, elapsed);
             };
 
             this.agoraVideoInst.onLeaveChannel = function (totalDuration, txBytes, rxBytes,txKBitRate,rxKBitRate,txAudioKBitRate,rxAudioKBitRate,txVideoKBitRate,rxVideoKBitRate,users,cpuTotalUsage,cpuAppUsage){
                 cc.log("[js]onLeaveChannel, totalDuration:%s,utxBytes :%d, rxBytes : %d !\n", totalDuration, txBytes, rxBytes);
+                self.addTips(" Leave Channel Successfully !");
+
             };
 
             this.agoraVideoInst.onFirstRemoteVideoDecoded = function(uid,  width,  height, elapsed){
@@ -90,9 +90,6 @@ var agora_module = {
         if(this.agoraVideoInst == null){
             cc.log("agoraVideoInst  is null !");
             return false;
-        }else {
-         
-
         }
 
         if(this._remoteVideoSprite == null){
