@@ -57,8 +57,6 @@ cc.Class({
     // use this for initialization
     onLoad: function () {        
 
-        this.initUI();
-
         this.initEvent();
 
         this.label.string = this.text;
@@ -66,11 +64,7 @@ cc.Class({
         cc.log("[onload] end");
     },
 
-    initUI: function(){
-
-    },
-
-     // called every frame
+    // called every frame
     update: function (dt) {
 
     },
@@ -105,18 +99,25 @@ cc.Class({
             callback:function (event){
                 cc.log("localVideo display ！\n");
 
-                // _localVideoSprite = agoraVideo.agoraVideoInst.getLocalSprite();
-                // _localVideoSprite.setPosition(cc.p(visibleSize.width/2, visibleSize.height/2));
+                var node = new cc.Sprite();
+
+                _localVideoSprite = agoraVideo.agoraVideoInst.getLocalSprite();
+                _localVideoSprite.setPosition(cc.p(visibleSize.width/2, visibleSize.height/2));
+                // node.spriteFrame = _localVideoSprite;
+                // 并将节点添加到场景中
+                cc.director.getScene().addChild(node);
+
+                // node.addComponent(_localVideoSprite);
+
                 // mythis.addChild(_localVideoSprite);
+
+                // node.addComponent(_localVideoSprite);
+                // this.node._sgNode.addChild(node);
+                // this.node._sgNode.addChild(_localVideoSprite);
+
 
                 // this.localSprite.spriteFrame =_localVideoSprite;
                 // this.node.addChild(_localVideoSprite);
-
-                // var scene = cc.director.getScene();
-                // var node = cc.instantiate(this._localVideoSprite);
-
-                // node.parent = scene;
-                // node.setPosition(0, 0);
 
             }
         },this.node);
