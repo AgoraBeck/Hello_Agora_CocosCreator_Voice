@@ -3,8 +3,8 @@ var agora_module = {
 
     AGORAEVT: {
         evt_tips: "msgTips", //< Tips message > 
-        evt_local:"localVideo",       
-        evt_remote:"remoteVideos",           
+        evt_jSuccess:"joinSuccess",       
+        evt_lSuccess:"leaveSuccess",           
     },
 
     roomInput: null,
@@ -23,9 +23,9 @@ var agora_module = {
         cc.eventManager.dispatchEvent(event);
     },
 
-    localNotify:function(channel, uid, elapsed)
+    jSuccessNotify:function(channel, uid, elapsed)
     {
-        var event = new cc.EventCustom(this.AGORAEVT.evt_local);
+        var event = new cc.EventCustom(this.AGORAEVT.evt_jSuccess);
         var msg =  {
             channel: channel,
             uid : uid,
@@ -35,9 +35,9 @@ var agora_module = {
         cc.eventManager.dispatchEvent(event);
     },
 
-    remoteNotify:function(uid, width, height,elapsed)
+    lSuccessNotify:function(uid, width, height,elapsed)
     {
-        var event = new cc.EventCustom(this.AGORAEVT.evt_remote);
+        var event = new cc.EventCustom(this.AGORAEVT.evt_lSuccess);
         var msg =  {
             uid: uid,
             width : width,
@@ -62,25 +62,13 @@ var agora_module = {
                 cc.log("[js] onJoinChannelSuccess, channel:%s,uid :%d, elapsed : %d !", channel, uid, elapsed);    
               
                 self.addTips(" Join Channel Successfully !");
-                self.localNotify(channel,  uid, elapsed);
+                self.jSuccessNotify(channel,  uid, elapsed);
             };
 
             this.agoraVideoInst.onLeaveChannel = function (totalDuration, txBytes, rxBytes,txKBitRate,rxKBitRate,txAudioKBitRate,rxAudioKBitRate,txVideoKBitRate,rxVideoKBitRate,users,cpuTotalUsage,cpuAppUsage){
                 cc.log("[js]onLeaveChannel, totalDuration:%s,utxBytes :%d, rxBytes : %d !\n", totalDuration, txBytes, rxBytes);
                 self.addTips(" Leave Channel Successfully !");
-
-            };
-
-            this.agoraVideoInst.onFirstRemoteVideoDecoded = function(uid,  width,  height, elapsed){
-                cc.log("[js]onLeaveChannel, uid:%d,width :%d, height :%d ,elapsed: %d!\n", uid, width, height,elapsed);
-                self.remoteNotify(uid,  width,  height, elapsed);
-            };
-
-            //enable
-            //  1: true
-            //  0: false
-            this.agoraVideoInst.onUserEnableVideo = function(uid, enable){
-                cc.log("[js]onUserEnableVideo, uid:%d, enable: %d\n", uid, enable);
+                self.lSuccessNotify(totalDuration, txBytes, rxBytes,txKBitRate);
             };
         }
     },
@@ -111,29 +99,7 @@ var agora_module = {
         }else {
             cc.log("leaveChannel is called Failed, errCode：%d\n",  errCode);
         }
-
-        this.clearVideoSprites()                   
     },
-    
-    clearVideoSprites:function(){
-                                      
-        if (null != _localVideoSprite){
-            this.removeChild(_localVideoSprite)
-            this._localVideoSprite = null;
-        }
-
-        if (null != this._remoteVideoSprite){
-            cc.log("_remoteVideoSprite.size : " + this._remoteVideoSprite.size);
-                        
-            for (var [key, value] of _remoteVideoSprite) {
-                console.log(key + ' = ' + value);
-                this.removeChild(value);
-                this._remoteVideoSprite.delete(key);
-            }
-                                      
-            cc.log("_remoteVideoSprite.size : " + this._remoteVideoSprite.size);
-        }                             
-    },                   
 };
 
 module.exports = agora_module;

@@ -1,10 +1,5 @@
 var agoraVideo = require("agoravideo");
 
-var _remoteVideoSprite = new Map();
-
-var _localVideoSprite = null;
-var _remoteVideoSprite = null;
-
 cc.Class({
     extends: cc.Component,
 
@@ -33,8 +28,8 @@ cc.Class({
             default: null,
             type: cc.Button
         },
-
-        btnMic: {
+        
+        btnMuteLocal: {
             default: null,
             type: cc.Button
         },
@@ -44,13 +39,11 @@ cc.Class({
             type: cc.Button
         },
 
-        // localSprite: {
-        //     default: null,
-        //     type: cc.Node,
-        // },
-
         //defaults, set visually when attaching this script to the Canvas
         text: 'Hello Agora !',
+
+        bMuteLocal:false,
+        bSetSpeakerPhone:false,
 
     },
 
@@ -60,8 +53,15 @@ cc.Class({
         this.initEvent();
 
         this.label.string = this.text;
-        
-        cc.log("[onload] end");
+
+        this.updateUI(false);
+    },
+
+    updateUI: function(bInited){
+        this.btnJoin.interactable = !bInited;
+        this.btnLeave.interactable = bInited;
+        this.btnMuteLocal.interactable = bInited;
+        this.btnSpearker.interactable = bInited;
     },
 
     // called every frame
@@ -75,10 +75,6 @@ cc.Class({
         
         var self = this;
 
-        if(this instanceof cc._BaseNode)
-            cc.log(" beck 4 ");
-
-    
         cc.eventManager.addListener({
             event: cc.EventListener.CUSTOM,   
             eventName: agoraVideo.AGORAEVT.evt_tips,            
@@ -95,43 +91,18 @@ cc.Class({
 
         cc.eventManager.addListener({
             event:cc.EventListener.CUSTOM,
-            eventName:agoraVideo.AGORAEVT.evt_local,
+            eventName:agoraVideo.AGORAEVT.evt_jSuccess,
             callback:function (event){
-                cc.log("localVideo display ！\n");
-
-                var node = new cc.Sprite();
-
-                _localVideoSprite = agoraVideo.agoraVideoInst.getLocalSprite();
-                _localVideoSprite.setPosition(cc.p(visibleSize.width/2, visibleSize.height/2));
-                // node.spriteFrame = _localVideoSprite;
-                // 并将节点添加到场景中
-                cc.director.getScene().addChild(node);
-
-                // node.addComponent(_localVideoSprite);
-
-                // mythis.addChild(_localVideoSprite);
-
-                // node.addComponent(_localVideoSprite);
-                // this.node._sgNode.addChild(node);
-                // this.node._sgNode.addChild(_localVideoSprite);
-
-
-                // this.localSprite.spriteFrame =_localVideoSprite;
-                // this.node.addChild(_localVideoSprite);
-
+                self.updateUI(true);       
             }
         },this.node);
 
         cc.eventManager.addListener({
             event:cc.EventListener.CUSTOM,
-            eventName: agoraVideo.AGORAEVT.evt_remote,
-            callback:function (event){
-                agoraVideo.addTips("joinChannel Success !")
+            eventName: agoraVideo.AGORAEVT.evt_lSuccess,
+            callback:function (event){    
                 var msg = event.getUserData();
-                                                
-                // _remoteVideoSprite.set(msg.uid, agoraVideo.getRemoteSprites(msg.uid));
-                // _remoteVideoSprite.get(msg.uid).setPosition(cc.p((visibleSize.width/2 + 330), visibleSize.height/2));
-                // mythis.addChild(_remoteVideoSprite.get(msg.uid));
+                self.updateUI(false);                                      
             }
         },this.node);
 
@@ -148,6 +119,7 @@ cc.Class({
         var g_roomName = this.channelName.string;
 
         if(g_roomName == ""){
+            agoraVideo.addTips("roomName is null."); 
             cc.log("roomName is '' ");
             return false;
         }else {
@@ -157,16 +129,16 @@ cc.Class({
         //agoraVideo
         /*!
          *  @param g_roomName   Channel name
-         *  @param uid  user id.
-         *  @param  videoEnabled   1: enable  video , 0: disable video
-         *  @param  videoMode   one of VIDEO_PROFILE  in agora_cocos2dx.h
+         *  @param uid  user id, 0:SDK will generate it,or uid of app player's id
+         *  @param  videoEnabled    0
+         *  @param  videoMode   0
          *  @param  info   ""
          *  @return errCode
          */
 
         var uid = 0;
-        var videoEnabled = 1;
-        var videoMode = 35;
+        var videoEnabled = 0;
+        var videoMode = 0;
         var info ="";
         if(agoraVideo.agoraVideoInst == null){
             cc.log("agoraVideoInst should be not null.");
@@ -183,9 +155,26 @@ cc.Class({
         agoraVideo.agoraVideoInst.leaveChannel();
     },  
 
-    btntestClick: function (event, customEventData) {
-        this.label.string ="testing ...";
-        agoraVideo.addTips("加油 ！");
-         cc.log("hasEventListener : " + cc.eventManager.hasEventListener(agoraVideo.AGORAEVT.evt_tips)); 
+    btnMuteLocalClick: function (event, customEventData) {        
+        if(!this.bMuteLocal){
+            this.bMuteLocal = !this.bMuteLocal;
+            agoraVideo.addTips("muteLocalAudioStream: " + this.bMuteLocal);                
+        } else {
+            this.bMuteLocal = !this.bMuteLocal;
+            agoraVideo.addTips("muteLocalAudioStream: " + this.bMuteLocal);            
+        }
+        agoraVideo.agoraVideoInst.muteLocalAudioStream(this.bMuteLocal);
+    },
+
+    btnSetSpeakerPhoneClick: function (event, customEventData) {
+        if(!this.bSetSpeakerPhone){
+            this.bSetSpeakerPhone = !this.bSetSpeakerPhone;
+            agoraVideo.addTips("setEnableSpeakerphone: " + this.bSetSpeakerPhone);                
+        } else {
+            this.bSetSpeakerPhone = !this.bSetSpeakerPhone;
+            agoraVideo.addTips("setEnableSpeakerphone: " + this.bSetSpeakerPhone);            
+        }
+        agoraVideo.agoraVideoInst.setEnableSpeakerphone(this.bSetSpeakerPhone);
+       
     },
 });
