@@ -9,7 +9,7 @@ var agora_module = {
 
     roomInput: null,
                           
-    agoraVideoInst: null,
+    agoraAudioInst: null,
         
     addTips:function(strTips, errcode)
     {
@@ -51,21 +51,21 @@ var agora_module = {
     
     initAgoraVide:function(){
 
-        if(this.agoraVideoInst == null)
+        if(this.agoraAudioInst == null)
         {
-            this.agoraVideoInst = new AgoraVideo();
+            this.agoraAudioInst = new agoraAudio();
         }
         var self = this;
-        if(this.agoraVideoInst != null)
+        if(this.agoraAudioInst != null)
         {
-            this.agoraVideoInst.onJoinChannelSuccess = function(channel,  uid, elapsed){
+            this.agoraAudioInst.onJoinChannelSuccess = function(channel,  uid, elapsed){
                 cc.log("[js] onJoinChannelSuccess, channel:%s,uid :%d, elapsed : %d !", channel, uid, elapsed);    
               
                 self.addTips(" Join Channel Successfully !");
                 self.jSuccessNotify(channel,  uid, elapsed);
             };
 
-            this.agoraVideoInst.onLeaveChannel = function (totalDuration, txBytes, rxBytes,txKBitRate,rxKBitRate,txAudioKBitRate,rxAudioKBitRate,txVideoKBitRate,rxVideoKBitRate,users,cpuTotalUsage,cpuAppUsage){
+            this.agoraAudioInst.onLeaveChannel = function (totalDuration, txBytes, rxBytes,txKBitRate,rxKBitRate,txAudioKBitRate,rxAudioKBitRate,txVideoKBitRate,rxVideoKBitRate,users,cpuTotalUsage,cpuAppUsage){
                 cc.log("[js]onLeaveChannel, totalDuration:%s,utxBytes :%d, rxBytes : %d !\n", totalDuration, txBytes, rxBytes);
                 self.addTips(" Leave Channel Successfully !");
                 self.lSuccessNotify(totalDuration, txBytes, rxBytes,txKBitRate);
@@ -75,8 +75,8 @@ var agora_module = {
 
     joinChannel:function(g_roomName, uid, videoEnabled, videoMode, info){
        
-        if(this.agoraVideoInst == null){
-            cc.log("agoraVideoInst  is null !");
+        if(this.agoraAudioInst == null){
+            cc.log("agoraAudioInst  is null !");
             return false;
         }
 
@@ -84,7 +84,7 @@ var agora_module = {
             this._remoteVideoSprite =  new Map(); 
         };  
     
-        var errCode = this.agoraVideoInst.joinChannel(g_roomName, uid, videoEnabled, videoMode, info);
+        var errCode = this.agoraAudioInst.joinChannel(g_roomName, uid, videoEnabled, videoMode, info);
         if( 0  == errCode){
             cc.log("logIn Successfully !\n");
         }else {
@@ -93,7 +93,7 @@ var agora_module = {
     },
                              
     leaveChannel:function(){
-        var errCode = this.agoraVideo.leaveChannel();
+        var errCode = this.agoraAudio.leaveChannel();
         if( 0 == errCode){
             cc.log("leaveChannel is called Successfully !\n");
         }else {

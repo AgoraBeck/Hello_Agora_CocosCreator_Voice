@@ -25,7 +25,6 @@
     "REMOTE_SERVER_ROOT": "",
     "orientation": "portrait"
   },
-  "renderMode": "0",
   "startScene": "2920d640-30e0-4643-a8ec-b2a2d6e99960",
   "title": "Hello_Agora_CocosCreator",
   "webOrientation": "auto",
@@ -37,5 +36,13 @@
     "subContext": ""
   },
   "xxteaKey": "312f676c-6e0e-4a",
-  "zipCompressJs": true
+  "zipCompressJs": true,
+  "android-instant": {
+    "REMOTE_SERVER_ROOT": "",
+    "pathPattern": "",
+    "scheme": "https",
+    "host": "",
+    "skipRecord": false,
+    "recordPath": ""
+  }
 }
