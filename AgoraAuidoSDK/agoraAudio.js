@@ -1,5 +1,5 @@
 
-var agora_module = {
+var agoraAudio_module = {
 
     AGORAEVT: {
         evt_tips: "msgTips", //< Tips message > 
@@ -49,15 +49,18 @@ var agora_module = {
         cc.eventManager.dispatchEvent(event);
     },
     
-    initAgoraVide:function(){
+    initAgoraAudio:function(appid){
 
         if(this.agoraAudioInst == null)
         {
+            cc.log("[js] new agoraAudio()" )
             this.agoraAudioInst = new agoraAudio();
         }
         var self = this;
         if(this.agoraAudioInst != null)
         {
+            cc.log("[js] agoraAudioInst.initialize()" )
+            this.agoraAudioInst.initialize(appid)
             this.agoraAudioInst.onJoinChannelSuccess = function(channel,  uid, elapsed){
                 cc.log("[js] onJoinChannelSuccess, channel:%s,uid :%d, elapsed : %d !", channel, uid, elapsed);    
               
@@ -73,8 +76,9 @@ var agora_module = {
         }
     },
 
-    joinChannel:function(g_roomName, uid, videoEnabled, videoMode, info){
-       
+    
+    joinChannel:function(token, channelId, info, uid){
+
         if(this.agoraAudioInst == null){
             cc.log("agoraAudioInst  is null !");
             return false;
@@ -102,4 +106,4 @@ var agora_module = {
     },
 };
 
-module.exports = agora_module;
+module.exports = agoraAudio_module;

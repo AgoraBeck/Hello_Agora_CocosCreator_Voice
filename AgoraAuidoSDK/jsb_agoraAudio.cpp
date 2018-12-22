@@ -10,6 +10,8 @@
 #include "scripting/js-bindings/manual/jsb_conversions.hpp"
 #include "scripting/js-bindings/manual/jsb_global.h"
 #include "cocos2d.h"
+#include "platform/CCApplication.h"
+#include "base/CCScheduler.h"
 
 #include <stddef.h>
 #include <stdio.h>
@@ -55,7 +57,7 @@
 #include <string.h>
 
 using namespace cocos2d;
-using namespace agora::rtc::cocos2dx;
+using namespace agora::rtc;
 
 class CAgoraAudioJsWrapper;
 CAgoraAudioJsWrapper* g_SingleInstance;
@@ -63,10 +65,12 @@ CAgoraAudioJsWrapper* g_SingleInstance;
 se::Object *js_cocos2dx_agoraAudio_prototype = nullptr;
 se::Class *js_cocos2dx_agoraAudio_class = nullptr;
 
-class CAgoraAudioJsWrapper: public IRtcEngineEventHandler {
+class CAgoraAudioJsWrapper:public IRtcEngineEventHandler {
 public:
 //    static CAgoraAudioJsWrapper* getInstance();
-    CAgoraAudioJsWrapper(){}
+    CAgoraAudioJsWrapper();
+    ~CAgoraAudioJsWrapper();
+    
 
 public:
     se::Object* _refObj;
@@ -80,11 +84,7 @@ public:
     * @param [in] elapsed
     *        the time elapsed in ms from the joinChannel been called to joining completed
     */
-    virtual void onJoinChannelSuccess(const char* channel, uid_t userId, int elapsed) {
-        (void)channel;
-        (void)userId;
-        (void)elapsed;
-    }
+    virtual void onJoinChannelSuccess(const char* channel, uid_t userId, int elapsed);
 
     /**
     * when join channel success, the function will be called
@@ -95,12 +95,7 @@ public:
     * @param [in] elapsed
     *        the time elapsed in ms elapsed
     */
-    virtual void onRejoinChannelSuccess(const char* channel, uid_t userId, int elapsed) {
-        (void)channel;
-        (void)userId;
-        (void)elapsed;
-    }
-
+    virtual void onRejoinChannelSuccess(const char* channel, uid_t userId, int elapsed);
     /**
     * when warning message coming, the function will be called
     * @param [in] warn
@@ -108,10 +103,7 @@ public:
     * @param [in] msg
     *        the warning message
     */
-    virtual void onWarning(int warn, const char* msg) {
-        (void)warn;
-        (void)msg;
-    }
+    virtual void onWarning(int warn, const char* msg);
 
     /**
     * when error message come, the function will be called
@@ -120,10 +112,7 @@ public:
     * @param [in] msg
     *        the error message
     */
-    virtual void onError(int err, const char* msg) {
-        (void)err;
-        (void)msg;
-    }
+    virtual void onError(int err, const char* msg);
 
     /**
     * when audio quality message come, the function will be called
@@ -136,12 +125,7 @@ public:
     * @param [in] lost
     *        the rate of the audio packages lost
     */
-    virtual void onAudioQuality(uid_t userId, int quality, unsigned short delay, unsigned short lost) {
-        (void)userId;
-        (void)quality;
-        (void)delay;
-        (void)lost;
-    }
+    virtual void onAudioQuality(uid_t userId, int quality, unsigned short delay, unsigned short lost);
 
     /**
     * when the audio volume information come, the function will be called
@@ -152,29 +136,21 @@ public:
     * @param [in] totalVolume
     *        the total volume of all users
     */
-    virtual void onAudioVolumeIndication(const AudioVolumeInfo* speakers, unsigned int speakerNumber, int totalVolume) {
-        (void)speakers;
-        (void)speakerNumber;
-        (void)totalVolume;
-    }
+    virtual void onAudioVolumeIndication(const AudioVolumeInfo* speakers, unsigned int speakerNumber, int totalVolume);
 
     /**
     * when the audio volume information come, the function will be called
     * @param [in] stats
     *        the statistics of the call
     */
-    virtual void onLeaveChannel(const RtcStats& stats) {
-        (void)stats;
-    }
+    virtual void onLeaveChannel(const RtcStats& stats);
 
     /**
     * when the information of the RTC engine stats come, the function will be called
     * @param [in] stats
     *        the RTC engine stats
     */
-    virtual void onRtcStats(const RtcStats& stats) {
-        (void)stats;
-    }
+    virtual void onRtcStats(const RtcStats& stats);
 
     /**
     * when the audio device state changed(plugged or removed), the function will be called
@@ -185,46 +161,23 @@ public:
     * @param [in] deviceState
     *        the device is been removed or added
     */
-    virtual void onAudioDeviceStateChanged(const char* deviceId, int deviceType, int deviceState) {
-        (void)deviceId;
-        (void)deviceType;
-        (void)deviceState;
-    }
+    virtual void onAudioDeviceStateChanged(const char* deviceId, int deviceType, int deviceState);
 
     /**
      * When audio mixing file playback finished, this function will be called
      */
-    virtual void onAudioMixingFinished() {
-    }
+    virtual void onAudioMixingFinished();
 
     /**
      * When far-end rhythm begins/ends, these functions will be called
      */
-    virtual void onRemoteAudioMixingBegin() {
-    }
-    virtual void onRemoteAudioMixingEnd() {
-    }
-
+    virtual void onRemoteAudioMixingBegin();
+    
+    virtual void onRemoteAudioMixingEnd();
     /**
     * When audio effect playback finished, this function will be called
     */
-    virtual void onAudioEffectFinished(int soundId) {
-    }
-
-    /**
-    * when the video device state changed(plugged or removed), the function will be called
-    * @param [in] deviceId
-    *        the ID of the state changed video device
-    * @param [in] deviceType
-    *        not used
-    * @param [in] deviceState
-    *        the device is been removed or added
-    */
-    virtual void onVideoDeviceStateChanged(const char* deviceId, int deviceType, int deviceState) {
-        (void)deviceId;
-        (void)deviceType;
-        (void)deviceState;
-    }
+    virtual void onAudioEffectFinished(int soundId);
 
     /**
     * report the network quality
@@ -235,94 +188,14 @@ public:
 	* @param [in] rxQuality
 	*        the score of the recv network quality 0~5 the higher the better
 	*/
-    virtual void onNetworkQuality(uid_t userId, int txQuality, int rxQuality) {
-        (void)userId;
-		(void)txQuality;
-		(void)rxQuality;
-    }
+    virtual void onNetworkQuality(uid_t userId, int txQuality, int rxQuality);
 
     /**
     * report the last-mile test network quality
     * @param [in] quality
     *        the score of the network quality 0~5 the higher the better
     */
-    virtual void onLastmileQuality(int quality) {
-        (void)quality;
-    }
-
-    /**
-    * when the first local video frame displayed, the function will be called
-    * @param [in] width
-    *        the width of the video frame
-    * @param [in] height
-    *        the height of the video frame
-    * @param [in] elapsed
-    *        the time elapsed from channel joined in ms
-    */
-    // virtual void onFirstLocalVideoFrame(int width, int height, int elapsed) {
-    //     (void)width;
-    //     (void)height;
-    //     (void)elapsed;
-    // }
-
-    /**
-    * when the first remote video frame decoded, the function will be called
-    * @param [in] userId
-    *        the userId of the remote user
-    * @param [in] width
-    *        the width of the video frame
-    * @param [in] height
-    *        the height of the video frame
-    * @param [in] elapsed
-    *        the time elapsed from channel joined in ms
-    */
-    // virtual void onFirstRemoteVideoDecoded(uid_t userId, int width, int height, int elapsed) {
-    //     (void)userId;
-    //     (void)width;
-    //     (void)height;
-    //     (void)elapsed;
-    // }
-
-    /**
-     * when video size changed or rotation changed, the function will be called
-     * @param [in] userId
-     *        the userId of the remote user or local user (0)
-     * @param [in] width
-     *        the new width of the video
-     * @param [in] height
-     *        the new height of the video
-     * @param [in] rotation
-     *        the rotation of the video
-     */
-    // virtual void onVideoSizeChanged(uid_t userId, int width, int height, int rotation) {
-    //     (void)userId;
-    //     (void)width;
-    //     (void)height;
-    //     (void)rotation;
-    // }
-    
-    // virtual void onRemoteVideoStateChanged(uid_t userId, REMOTE_VIDEO_STATE state) {
-    //     (void)userId;
-    //     (void)state;
-    // }
-
-    /**
-    * when the first remote video frame displayed, the function will be called
-    * @param [in] userId
-    *        the userId of the remote user
-    * @param [in] width
-    *        the width of the video frame
-    * @param [in] height
-    *        the height of the video frame
-    * @param [in] elapsed
-    *        the time elapsed from remote user called joinChannel in ms
-    */
-    // virtual void onFirstRemoteVideoFrame(uid_t userId, int width, int height, int elapsed) {
-    //     (void)userId;
-    //     (void)width;
-    //     (void)height;
-    //     (void)elapsed;
-    // }
+    virtual void onLastmileQuality(int quality);
 
     /**
     * when any other user joined in the same channel, the function will be called
@@ -331,20 +204,14 @@ public:
     * @param [in] elapsed
     *        the time elapsed from remote used called joinChannel to joining completed in ms
     */
-    virtual void onUserJoined(uid_t userId, int elapsed) {
-        (void)userId;
-        (void)elapsed;
-    }
+    virtual void onUserJoined(uid_t userId, int elapsed);
 
     /**
     * when user offline(exit channel or offline by accident), the function will be called
     * @param [in] userId
     *        the userId of the remote user
     */
-    virtual void onUserOffline(uid_t userId, USER_OFFLINE_REASON_TYPE reason) {
-        (void)userId;
-        (void)reason;
-    }
+    virtual void onUserOffline(uid_t userId, USER_OFFLINE_REASON_TYPE reason);
 
     /**
     * when remote user muted the audio stream, the function will be called
@@ -353,47 +220,9 @@ public:
     * @param [in] muted
     *        true: the remote user muted the audio stream, false: the remote user unmuted the audio stream
     */
-    virtual void onUserMuteAudio(uid_t userId, bool muted) {
-        (void)userId;
-        (void)muted;
-    }
+    virtual void onUserMuteAudio(uid_t userId, bool muted);
 
-    /**
-    * when remote user muted the video stream, the function will be called
-    * @param [in] userId
-    *        the userId of the remote user
-    * @param [in] muted
-    *        true: the remote user muted the video stream, false: the remote user unmuted the video stream
-    */
-    // virtual void onUserMuteVideo(uid_t userId, bool muted) {
-    //     (void)userId;
-    //     (void)muted;
-    // }
-
-	/**
-	* when remote user enable video function, the function will be called
-	* @param [in] userId
-	*        the userId of the remote user
-	* @param [in] enabled
-	*        true: the remote user has enabled video function, false: the remote user has disabled video function
-	*/
-    // virtual void onUserEnableVideo(uid_t userId, bool enabled) {
-    //     (void)userId;
-	// 	(void)enabled;
-	// }
-	
-	/**
-    * when remote user enable local video function, the function will be called
-    * @param [in] userId
-    *        the userId of the remote user
-    * @param [in] enabled
-    *        true: the remote user has enabled local video function, false: the remote user has disabled local video function
-    */
-    // virtual void onUserEnableLocalVideo(uid_t userId, bool enabled) {
-    //     (void)userId;
-    //     (void)enabled;
-    // }
-    
+   
     /**
     * when api call executed completely, the function will be called
     * @param [in] api
@@ -401,67 +230,24 @@ public:
     * @param [in] err
     *        error code while 0 means OK
     */
-    virtual void onApiCallExecuted(int err, const char* api, const char* result) {
-        (void)err;
-        (void)api;
-        (void)result;
-    }
-
-    /**
-	* reported local video stats
-	* @param [in] stats
-    *        the latest local video stats
-    */
-	// virtual void onLocalVideoStats(const LocalVideoStats& stats) {
-	// 	(void)stats;
-    // }
-
-    /**
-    * reported remote video stats
-    * @param [in] stats
-	*        the latest remote video stats
-	*/
-	// virtual void onRemoteVideoStats(const RemoteVideoStats& stats) {
-	// 	(void)stats;
-    // }
-
-    /**
-    * when the camera is ready to work, the function will be called
-    */
-    // virtual void onCameraReady() {}
-
-    // virtual void onCameraFocusAreaChanged(int x, int y, int width, int height) {
-        (void)x;
-        (void)y;
-        (void)width;
-        (void)height;
-    }
-
-    /**
-    * when all video stopped, the function will be called then you can repaint the video windows
-    */
-    // virtual void onVideoStopped() {}
+    virtual void onApiCallExecuted(int err, const char* api, const char* result);
 
     /**
     * when the network can not worked well, the function will be called
     */
-    virtual void onConnectionLost() {}
+    virtual void onConnectionLost();
 
     /**
     * when local user disconnected by accident, the function will be called(then SDK will try to reconnect itself)
     */
-    virtual void onConnectionInterrupted() {}
-    
+    virtual void onConnectionInterrupted();
     /**
      * when local user is banned by the server, the function will be called
      */
-    virtual void onConnectionBanned() {}
+    virtual void onConnectionBanned();
     
-    virtual void onRefreshRecordingServiceStatus(int status) {
-        (void)status;
-    }
+    virtual void onRefreshRecordingServiceStatus(int status);
 
-//    virtual void onStreamError(int streamId, int code, int parameter, const char* message, size_t length) {}
     /**
     * when stream message received, the function will be called
     * @param [in] userId
@@ -474,45 +260,25 @@ public:
     *        the message length, in bytes
     *        frame rate
     */
-    virtual void onStreamMessage(uid_t userId, int streamId, const char* data, size_t length) {
-        (void)userId;
-        (void)streamId;
-        (void)data;
-        (void)length;
-    }
+    virtual void onStreamMessage(uid_t userId, int streamId, const char* data, size_t length);
 
-	/**
-	* 
-	*/
-    virtual void onStreamMessageError(uid_t userId, int streamId, int code, int missed, int cached) {
-        (void)userId;
-        (void)streamId;
-        (void)code;
-        (void)missed;
-        (void)cached;
-    }
-
-    virtual void onMediaEngineLoadSuccess() {
-    }
-    virtual void onMediaEngineStartCallSuccess() {
-    }
+    virtual void onStreamMessageError(uid_t userId, int streamId, int code, int missed, int cached) ;
+    virtual void onMediaEngineLoadSuccess();
+    virtual void onMediaEngineStartCallSuccess();
     /**
     * when token is enabled, and specified token is invalid or expired, this function will be called.
     * APP should generate a new token and call renewToken() to refresh the token.
     * NOTE: to be compatible with previous version, ERR_TOKEN_EXPIRED and ERR_INVALID_TOKEN are also reported via onError() callback.
     * You should move renew of token logic into this callback.
     */
-    virtual void onRequestToken() {
-    }
+    virtual void onRequestToken();
 
     /**
     * when the first local audio frame generated, the function will be called
     * @param [in] elapsed
     *        the time elapsed from remote user called joinChannel in ms
     */
-    virtual void onFirstLocalAudioFrame(int elapsed) {
-        (void)elapsed;
-    }
+    virtual void onFirstLocalAudioFrame(int elapsed);
 
     /**
     * when the first remote audio frame arrived, the function will be called
@@ -521,50 +287,28 @@ public:
     * @param [in] elapsed
     *        the time elapsed from remote user called joinChannel in ms
     */
-    virtual void onFirstRemoteAudioFrame(uid_t userId, int elapsed) {
-        (void)userId;
-        (void)elapsed;
-    }
+    virtual void onFirstRemoteAudioFrame(uid_t userId, int elapsed);
     /** @param [in] userId
     *        the speaker userId who is talking in the channel
     */
-    virtual void onActiveSpeaker(uid_t userId) {
-        (void)userId;
-    }
+    virtual void onActiveSpeaker(uid_t userId);
 
     /**
     * when client role is successfully changed, the function will be called
     */
-    virtual void onClientRoleChanged(CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole) {
-    }
+    virtual void onClientRoleChanged(CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole);
 
-    virtual void onAudioDeviceVolumeChanged(MEDIA_DEVICE_TYPE deviceType, int volume, bool muted) {
-        (void)deviceType;
-        (void)volume;
-        (void)muted;
-    }
+    virtual void onAudioDeviceVolumeChanged(MEDIA_DEVICE_TYPE deviceType, int volume, bool muted);
 
-    virtual void onStreamPublished(const char *url, int error) {
-        (void)url;
-        (void)error;
-    }
+    virtual void onStreamPublished(const char *url, int error);
 
-    virtual void onStreamUnpublished(const char *url) {
-        (void)url;
-    }
+    virtual void onStreamUnpublished(const char *url);
 
-    virtual void onTranscodingUpdated() {
-    }
+    virtual void onTranscodingUpdated();
 
-    virtual void onStreamInjectedStatus(const char* url, uid_t userId, int status) {
-        (void)url;
-        (void)userId;
-        (void)status;
-    }
+    virtual void onStreamInjectedStatus(const char* url, uid_t userId, int status);
 
-	virtual void onAudioRoutingChanged(int routing) {
-		(void)routing;
-	}
+    virtual void onAudioRoutingChanged(int routing);
 
     /**
      * This callback is triggered when receiving audio packet from remote user
@@ -581,12 +325,7 @@ public:
      */
     virtual void onRemoteAudioTransportStats(
         uid_t uid, unsigned short delay, unsigned short lost,
-        unsigned short rxKBitRate) {
-        (void)uid;
-        (void)delay;
-        (void)lost;
-        (void)rxKBitRate;
-    }
+                                             unsigned short rxKBitRate);
 
     /**
      * This callback is triggered when receiving video packet from remote user
@@ -615,49 +354,54 @@ public:
      *   true: Microphone is enabled.
      *   false: Microphone is disabled.
     */
-	virtual void onMicrophoneEnabled(bool enabled) {
-		(void)enabled;
-	}
+    virtual void onMicrophoneEnabled(bool enabled) ;    
 };
 
-void CAgoraAudioJsWrapper::onJoinChannelSuccess(const char* channel, uid_t uid, int elapsed)
+CAgoraAudioJsWrapper::CAgoraAudioJsWrapper()
 {
-    CCLOG("[Agora]:onJoinChannelSuccess %s, %u, %d", channel, uid, elapsed);
-    static char channelName[0x100];
-    strcpy(channelName, channel);
+}
 
-    cocos2d::Director::getInstance()->getScheduler()->performFunctionInCocosThread([=] {
-        
+CAgoraAudioJsWrapper::~CAgoraAudioJsWrapper()
+{
+}
+
+void CAgoraAudioJsWrapper::onJoinChannelSuccess(const char* channel, uid_t userId, int elapsed)
+{
+    CCLOG("[Agora]:onJoinChannelSuccess %s, %u, %d", channel, userId, elapsed);
+    char channelName[0x100];
+    strcpy(channelName, channel);
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
         se::Value func;
         if (_refObj->getProperty("onJoinChannelSuccess", &func)) {
             se::ScriptEngine::getInstance()->clearException();
             se::AutoHandleScope hs;
-            
+
             se::ValueArray args;
             args.push_back(se::Value(channelName));
-            args.push_back(se::Value((uid_t)uid));
+            args.push_back(se::Value((uid_t)userId));
             args.push_back(se::Value((int)elapsed));
-          
+
             func.toObject()->call(args, _refObj);
         }
-    });
+    }
+   );
     
     return ;
 }
 
 void CAgoraAudioJsWrapper:: onLeaveChannel(const RtcStats& stats)
 {
-    CCLOG("[Agora]:onLeaveChannel %d, %d, %d", stats.totalDuration, stats.txBytes, stats.rxBytes);
-    clear();
+    CCLOG("[Agora]:onLeaveChannel %d, %d",  stats.txBytes, stats.rxBytes);
     
-    cocos2d::Director::getInstance()->getScheduler()->performFunctionInCocosThread([=] {
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
         se::Value func;
         if(_refObj->getProperty("onLeaveChannel", &func)){
             se::ScriptEngine::getInstance()->clearException();
             se::AutoHandleScope hs;
             
             se::ValueArray args;
-            args.push_back(se::Value((int)stats.totalDuration));
+//            args.push_back(se::Value((int)stats.totalDuration));
             args.push_back(se::Value((int)stats.txBytes));
             args.push_back(se::Value((int)stats.rxBytes));
             args.push_back(se::Value((int)stats.txKBitRate));
@@ -666,7 +410,7 @@ void CAgoraAudioJsWrapper:: onLeaveChannel(const RtcStats& stats)
             args.push_back(se::Value((int)stats.rxAudioKBitRate));
             args.push_back(se::Value((int)stats.txVideoKBitRate));
             args.push_back(se::Value((int)stats.rxVideoKBitRate));
-            args.push_back(se::Value((int)stats.users));
+//            args.push_back(se::Value((int)stats.users));
             args.push_back(se::Value((double)stats.cpuTotalUsage));
             args.push_back(se::Value((double)stats.cpuAppUsage));
             
@@ -678,11 +422,6 @@ void CAgoraAudioJsWrapper:: onLeaveChannel(const RtcStats& stats)
 }
 
 
-void CAgoraAudioJsWrapper::onJoinChannelSuccess(const char* channel, uid_t userId, int elapsed) {
-    (void)channel;
-    (void)userId;
-    (void)elapsed;
-}
 
 
 void CAgoraAudioJsWrapper::onRejoinChannelSuccess(const char* channel, uid_t userId, int elapsed) {
@@ -709,16 +448,12 @@ void CAgoraAudioJsWrapper::onAudioQuality(uid_t userId, int quality, unsigned sh
     (void)lost;
 }
 
-
 void CAgoraAudioJsWrapper::onAudioVolumeIndication(const AudioVolumeInfo* speakers, unsigned int speakerNumber, int totalVolume) {
     (void)speakers;
     (void)speakerNumber;
     (void)totalVolume;
 }
 
-void CAgoraAudioJsWrapper::onLeaveChannel(const RtcStats& stats) {
-    (void)stats;
-}
 
 
 void CAgoraAudioJsWrapper::onRtcStats(const RtcStats& stats) {
@@ -738,6 +473,7 @@ void CAgoraAudioJsWrapper::onAudioMixingFinished() {
 
 void CAgoraAudioJsWrapper::onRemoteAudioMixingBegin() {
 }
+
 void CAgoraAudioJsWrapper::onRemoteAudioMixingEnd() {
 }
 
@@ -745,18 +481,10 @@ void CAgoraAudioJsWrapper::onRemoteAudioMixingEnd() {
 void CAgoraAudioJsWrapper::onAudioEffectFinished(int soundId) {
 }
 
-
-void CAgoraAudioJsWrapper::onVideoDeviceStateChanged(const char* deviceId, int deviceType, int deviceState) {
-    (void)deviceId;
-    (void)deviceType;
-    (void)deviceState;
-}
-
-
 void CAgoraAudioJsWrapper::onNetworkQuality(uid_t userId, int txQuality, int rxQuality) {
     (void)userId;
-	(void)txQuality;
-	(void)rxQuality;
+    (void)txQuality;
+    (void)rxQuality;
 }
 
 void CAgoraAudioJsWrapper::onLastmileQuality(int quality) {
@@ -896,7 +624,7 @@ void CAgoraAudioJsWrapper::onMicrophoneEnabled(bool enabled) {
 
 static bool js_cocos2dx_extension_agoraAudio_initialize(se::State& s)
 {
-    CCLOG("[Agora] js_cocos2dx_extension_agoraAudio_initialize \n");
+    CCLOG("[Agora] js_cocos2dx_extension_agoraAudio_initialize");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
     SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_initialize : Invalid Native Object");
     const auto& args = s.args();
@@ -908,7 +636,7 @@ static bool js_cocos2dx_extension_agoraAudio_initialize(se::State& s)
         SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_initialize : Error processing arguments");
 
         RtcEngineContext ctx;
-        ctx.appId = appId;
+        ctx.appId = appId.c_str();
 	    ctx.eventHandler = g_SingleInstance;
         int ret = cobj->initialize(ctx);
 
@@ -925,7 +653,7 @@ SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_initialize)
 
 static bool js_cocos2dx_extension_agoraAudio_joinChannel(se::State& s)
 {
-    CCLOG("[Agora] js_cocos2dx_extension_agoraAudio_joinChannel \n");
+    CCLOG("[Agora] js_cocos2dx_extension_agoraAudio_joinChannel");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
     SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_joinChannel : Invalid Native Object");
     const auto& args = s.args();
@@ -944,7 +672,7 @@ static bool js_cocos2dx_extension_agoraAudio_joinChannel(se::State& s)
         uint32_t uid;
         ok &= seval_to_uint32(args[3], &uid);
    
-        int ret = cobj->joinChannel(token, channelId, info, uid);
+        int ret = cobj->joinChannel(token.c_str(), channelId.c_str(), info.c_str(), uid);
         int32_to_seval(ret, &s.rval());
         return true;
     }
@@ -1086,9 +814,9 @@ static bool js_cocos2dx_extension_agoraAudio_setParameters(se::State& s) {
         std::string strVal;
         ok &= seval_to_std_string(args[0], &strVal);
         
-        int ret = cobj->setParameters(strVal.c_str());
-        
-        int32_to_seval(ret, &s.rval());
+//        int ret = cobj->setParameters(strVal.c_str());
+//        
+//        int32_to_seval(ret, &s.rval());
         
         SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_setParameters : Error processing arguments");
         return true;
@@ -1289,10 +1017,10 @@ SE_BIND_FINALIZE_FUNC(js_agoraAudio_finalize)
 
 static bool js_cocos2dx_extension_agoraAudio_constructor(se::State& s)
 {
-    CCLOG("[Agora] constructor \n");
-    const auto& args = s.args();
+    CCLOG("[Agora] constructor");
+//    const auto& args = s.args();
     
-    size_t argc = args.size();
+//    size_t argc = args.size();
     
     if (g_SingleInstance == NULL){
         g_SingleInstance = new CAgoraAudioJsWrapper();
@@ -1319,7 +1047,7 @@ SE_BIND_CTOR(js_cocos2dx_extension_agoraAudio_constructor, js_cocos2dx_agoraAudi
 
 bool js_register_cocos2dx_extension_agoraAudio(se::Object* obj)
 {
-    CCLOG("[Agora] js_register_cocos2dx_extension_agoraAudio \n");
+    CCLOG("[Agora] js_register_cocos2dx_extension_agoraAudio");
     
     auto cls = se::Class::create("agoraAudio", obj, nullptr, _SE(js_cocos2dx_extension_agoraAudio_constructor));
     
@@ -1338,7 +1066,7 @@ bool js_register_cocos2dx_extension_agoraAudio(se::Object* obj)
     cls->defineFunction("muteRemoteAudioStream", _SE(js_cocos2dx_extension_agoraAudio_muteRemoteAudioStream));
     cls->defineFunction("setDefaultAudioRouteToSpeakerphone", _SE(js_cocos2dx_extension_agoraAudio_setDefaultAudioRouteToSpeakerphone));
     cls->defineFunction("setEnableSpeakerphone", _SE(js_cocos2dx_extension_agoraAudio_setEnableSpeakerphone));
-        
+//
     cls->defineFinalizeFunction(_SE(js_agoraAudio_finalize));
     cls->install();
 
@@ -1351,7 +1079,7 @@ bool js_register_cocos2dx_extension_agoraAudio(se::Object* obj)
 
 bool register_jsb_agoraAudio(se::Object* obj)
 {
-    CCLOG("[Agora] register_jsb_agoraAudio \n");
+    CCLOG("[Agora] register_jsb_agoraAudio");
     return js_register_cocos2dx_extension_agoraAudio(obj);
 }
 

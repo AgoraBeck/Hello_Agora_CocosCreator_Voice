@@ -113,40 +113,36 @@ cc.Class({
     },
 
     btnJoinRoomClick: function (event, customEventData) {
-        agoraAudio.initAgoraVide();
+        agoraAudio.initAgoraAudio("4c51ad802859440cbfb89eb75919d9ed"); // input: APPID
         this.label.string = "正在加入房间...";
-        var g_roomName = this.channelName.string;
+        var channelId = this.channelName.string;
 
-        if(g_roomName == ""){
-            agoraAudio.addTips("roomName is null."); 
-            cc.log("roomName is '' ");
+        if(channelId == ""){
+            agoraAudio.addTips("channelId is null."); 
+            cc.log("channelId is '' ");
             return false;
         }else {
-            cc.log("roomName: " + g_roomName);
+            cc.log("channelId: " + channelId);
         }
 
         //agoraAudio
         /*!
-         *  @param g_roomName   Channel name
+         *  @param  token   "" or token Value from App Server
+         *  @param channelId   Channel name
          *  @param uid  user id, 0:SDK will generate it,or uid of app player's id
-         *  @param  videoEnabled    0
-         *  @param  videoMode   0
          *  @param  info   ""
          *  @return errCode
          */
-
+        var token = "";
         var uid = 0;
-        var videoEnabled = 0;
-        var videoMode = 0;
-        var info ="";
+        var info = "";
         if(agoraAudio.agoraAudioInst == null){
             cc.log("agoraAudioInst should be not null.");
             return false;
         }else {
             cc.log("agoraAudioInst is not null.");
         }
-
-        agoraAudio.agoraAudioInst.joinChannel(g_roomName, uid, videoEnabled, videoMode, info);
+        agoraAudio.agoraAudioInst.joinChannel(token, channelId, info, uid);
     },
 
     btnLeaveRoomClick: function (event, customEventData) {
@@ -159,7 +155,7 @@ cc.Class({
             this.bMuteLocal = !this.bMuteLocal;
             agoraAudio.addTips("muteLocalAudioStream: " + this.bMuteLocal);                
         } else {
-            this.bMuteLocal = !this.bMuteLocal;
+            this.bMuteLocal = !this.bMuteLocal; 
             agoraAudio.addTips("muteLocalAudioStream: " + this.bMuteLocal);            
         }
         agoraAudio.agoraAudioInst.muteLocalAudioStream(this.bMuteLocal);
