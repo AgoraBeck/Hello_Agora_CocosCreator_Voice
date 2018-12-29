@@ -19,6 +19,11 @@ cc.Class({
             type: cc.EditBox
         },
 
+        btnInit: {
+            default: null,
+            type: cc.Button
+        },
+
         btnJoin: {
             default: null,
             type: cc.Button
@@ -54,11 +59,12 @@ cc.Class({
 
         this.label.string = this.text;
 
-        this.updateUI(false);
+        this.updateUI(true);
     },
 
     updateUI: function(bInited){
-        this.btnJoin.interactable = !bInited;
+        // this.btnJoin.interactable = !bInited;
+        this.btnJoin.interactable = bInited;
         this.btnLeave.interactable = bInited;
         this.btnMuteLocal.interactable = bInited;
         this.btnSpearker.interactable = bInited;
@@ -112,9 +118,15 @@ cc.Class({
 
     },
 
-    btnJoinRoomClick: function (event, customEventData) {
+    btnInitializeClick: function (event, customEventData) {
         agoraAudio.initAgoraAudio("4c51ad802859440cbfb89eb75919d9ed"); // input: APPID
-        this.label.string = "正在加入房间...";
+        this.label.string = "called initAgoraAudio ...";
+    },
+
+
+    btnJoinRoomClick: function (event, customEventData) {
+        // agoraAudio.initAgoraAudio("4c51ad802859440cbfb89eb75919d9ed"); // input: APPID
+        this.label.string = "join agora Channel...";
         var channelId = this.channelName.string;
 
         if(channelId == ""){
