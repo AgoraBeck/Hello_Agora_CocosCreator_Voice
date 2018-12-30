@@ -368,7 +368,7 @@ CAgoraAudioJsWrapper::~CAgoraAudioJsWrapper()
 void CAgoraAudioJsWrapper::onJoinChannelSuccess(const char* channel, uid_t userId, int elapsed)
 {
     CCLOG("[Agora]:onJoinChannelSuccess %s, %u, %d", channel, userId, elapsed);
-    char channelName[0x100];
+    static char channelName[0x100];
     strcpy(channelName, channel);
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -376,7 +376,6 @@ void CAgoraAudioJsWrapper::onJoinChannelSuccess(const char* channel, uid_t userI
         if (_refObj->getProperty("onJoinChannelSuccess", &func)) {
             se::ScriptEngine::getInstance()->clearException();
             se::AutoHandleScope hs;
-
             se::ValueArray args;
             args.push_back(se::Value(channelName));
             args.push_back(se::Value((uid_t)userId));
@@ -384,8 +383,7 @@ void CAgoraAudioJsWrapper::onJoinChannelSuccess(const char* channel, uid_t userI
 
             func.toObject()->call(args, _refObj);
         }
-    }
-   );
+    });
     
     return ;
 }
@@ -421,31 +419,84 @@ void CAgoraAudioJsWrapper:: onLeaveChannel(const RtcStats& stats)
     return ;
 }
 
-
-
-
 void CAgoraAudioJsWrapper::onRejoinChannelSuccess(const char* channel, uid_t userId, int elapsed) {
-    (void)channel;
-    (void)userId;
-    (void)elapsed;
+
+    CCLOG("[Agora]:onRejoinChannelSuccess %s, %u, %d", channel, userId, elapsed);
+    static char channelName[0x100];
+    strcpy(channelName, channel);
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onRejoinChannelSuccess", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            args.push_back(se::Value(channelName));
+            args.push_back(se::Value((uid_t)userId));
+            args.push_back(se::Value((int)elapsed));
+            
+            func.toObject()->call(args, _refObj);
+        }
+    });
+    return ;
+
 }
 
-
 void CAgoraAudioJsWrapper::onWarning(int warn, const char* msg) {
-    (void)warn;
-    (void)msg;
+    CCLOG("[Agora]:onWarning %d, %s", warn, msg);
+    std::string strMsg = msg;
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onWarning", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            args.push_back(se::Value((int)warn));
+            args.push_back(se::Value(strMsg));
+            func.toObject()->call(args, _refObj);
+        }
+    });
+    
+    return ;
 }
 
 void CAgoraAudioJsWrapper::onError(int err, const char* msg) {
-    (void)err;
-    (void)msg;
+    CCLOG("[Agora]:onError %d, %s", err, msg);
+    std::string strMsg = msg;
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onError", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            args.push_back(se::Value((int)err));
+            args.push_back(se::Value(strMsg));
+            func.toObject()->call(args, _refObj);
+        }
+    });
+    
+    return ;
 }
 
 void CAgoraAudioJsWrapper::onAudioQuality(uid_t userId, int quality, unsigned short delay, unsigned short lost) {
-    (void)userId;
-    (void)quality;
-    (void)delay;
-    (void)lost;
+    CCLOG("[Agora]:onAudioQuality %u, %d", userId, quality);
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onAudioQuality", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            
+            args.push_back(se::Value((uid_t)userId));
+            args.push_back(se::Value((int)quality));
+            args.push_back(se::Value((int)delay));
+            args.push_back(se::Value((int)lost));
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
 
 void CAgoraAudioJsWrapper::onAudioVolumeIndication(const AudioVolumeInfo* speakers, unsigned int speakerNumber, int totalVolume) {
@@ -457,51 +508,171 @@ void CAgoraAudioJsWrapper::onAudioVolumeIndication(const AudioVolumeInfo* speake
 
 
 void CAgoraAudioJsWrapper::onRtcStats(const RtcStats& stats) {
-    (void)stats;
+    CCLOG("[Agora]:onRtcStats %d, %d",  stats.txBytes, stats.rxBytes);
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if(_refObj->getProperty("onRtcStats", &func)){
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            
+            se::ValueArray args;
+            args.push_back(se::Value((int)stats.txBytes));
+            args.push_back(se::Value((int)stats.rxBytes));
+            args.push_back(se::Value((int)stats.txKBitRate));
+            args.push_back(se::Value((int)stats.rxKBitRate));
+            args.push_back(se::Value((int)stats.txAudioKBitRate));
+            args.push_back(se::Value((int)stats.rxAudioKBitRate));
+            args.push_back(se::Value((int)stats.txVideoKBitRate));
+            args.push_back(se::Value((int)stats.rxVideoKBitRate));
+            args.push_back(se::Value((double)stats.cpuTotalUsage));
+            args.push_back(se::Value((double)stats.cpuAppUsage));
+            
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
 
 
 void CAgoraAudioJsWrapper::onAudioDeviceStateChanged(const char* deviceId, int deviceType, int deviceState) {
-    (void)deviceId;
-    (void)deviceType;
-    (void)deviceState;
+    CCLOG("[Agora]:onAudioDeviceStateChanged %s, %d", deviceId, deviceType);
+    std::string strDeviceId = deviceId;
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onAudioDeviceStateChanged", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            args.push_back(se::Value((int)deviceType));
+            args.push_back(se::Value((int)deviceState));
+            args.push_back(se::Value(strDeviceId));
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
 
 
 void CAgoraAudioJsWrapper::onAudioMixingFinished() {
+    CCLOG("[Agora]:onAudioMixingFinished ");
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onAudioMixingFinished", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
 
 void CAgoraAudioJsWrapper::onRemoteAudioMixingBegin() {
+    CCLOG("[Agora]:onRemoteAudioMixingBegin ");
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onRemoteAudioMixingBegin", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
 
 void CAgoraAudioJsWrapper::onRemoteAudioMixingEnd() {
+    CCLOG("[Agora]:onRemoteAudioMixingEnd ");
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onRemoteAudioMixingEnd", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
 
-
 void CAgoraAudioJsWrapper::onAudioEffectFinished(int soundId) {
+    CCLOG("[Agora]:onAudioEffectFinished ");
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onAudioEffectFinished", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
 
 void CAgoraAudioJsWrapper::onNetworkQuality(uid_t userId, int txQuality, int rxQuality) {
-    (void)userId;
-    (void)txQuality;
-    (void)rxQuality;
+    CCLOG("[Agora]:onNetworkQuality %u, %d, %d", userId, txQuality,rxQuality);
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onNetworkQuality", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            args.push_back(se::Value((uid_t)userId));
+            args.push_back(se::Value((int)txQuality));
+            args.push_back(se::Value((int)rxQuality));
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
 
 void CAgoraAudioJsWrapper::onLastmileQuality(int quality) {
-    (void)quality;
+    CCLOG("[Agora]:onLastmileQuality %d", quality);
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onLastmileQuality", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            
+            args.push_back(se::Value((int)quality));
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
 
 void CAgoraAudioJsWrapper::onUserJoined(uid_t userId, int elapsed) {
-    (void)userId;
-    (void)elapsed;
+    CCLOG("[Agora]:onUserJoined %u", userId);
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onUserJoined", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            args.push_back(se::Value((uid_t)userId));
+            args.push_back(se::Value((int)elapsed));
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
-
 
 void CAgoraAudioJsWrapper::onUserOffline(uid_t userId, USER_OFFLINE_REASON_TYPE reason) {
-    (void)userId;
-    (void)reason;
+    CCLOG("[Agora]:onUserOffline %u", userId);
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onUserOffline", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            args.push_back(se::Value((uid_t)userId));
+            args.push_back(se::Value((int)reason));
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
-
 
 void CAgoraAudioJsWrapper::onUserMuteAudio(uid_t userId, bool muted) {
     (void)userId;
@@ -510,23 +681,74 @@ void CAgoraAudioJsWrapper::onUserMuteAudio(uid_t userId, bool muted) {
 
 
 void CAgoraAudioJsWrapper::onApiCallExecuted(int err, const char* api, const char* result) {
-    (void)err;
-    (void)api;
-    (void)result;
+    CCLOG("[Agora]:onApiCallExecuted : %d, %s, %s", err, api, result);
+    
+    std::string apiMsg = api;
+    std::string resultMsg = result;
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onApiCallExecuted", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            
+            args.push_back(se::Value((int)err));
+            args.push_back(se::Value(apiMsg));
+            args.push_back(se::Value(resultMsg));
+            
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
 
-void CAgoraAudioJsWrapper::onConnectionLost() {}
+void CAgoraAudioJsWrapper::onConnectionLost() {
+    CCLOG("[Agora]:onConnectionLost ");
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onConnectionLost", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            func.toObject()->call(args, _refObj);
+        }
+    });
+}
 
 
-void CAgoraAudioJsWrapper::onConnectionInterrupted() {}
+void CAgoraAudioJsWrapper::onConnectionInterrupted() {
+    CCLOG("[Agora]:onConnectionInterrupted ");
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onConnectionInterrupted", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            func.toObject()->call(args, _refObj);
+        }
+    });
+}
 
 
-void CAgoraAudioJsWrapper::onConnectionBanned() {}
+void CAgoraAudioJsWrapper::onConnectionBanned() {
+    CCLOG("[Agora]:onConnectionBanned ");
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onConnectionBanned", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            func.toObject()->call(args, _refObj);
+        }
+    });
+}
 
 void CAgoraAudioJsWrapper::onRefreshRecordingServiceStatus(int status) {
     (void)status;
 }
-
 
 
 void CAgoraAudioJsWrapper::onStreamMessage(uid_t userId, int streamId, const char* data, size_t length) {
@@ -544,8 +766,7 @@ void CAgoraAudioJsWrapper::onStreamMessageError(uid_t userId, int streamId, int 
     (void)cached;
 }
 
-void CAgoraAudioJsWrapper::onMediaEngineLoadSuccess() {
-}
+void CAgoraAudioJsWrapper::onMediaEngineLoadSuccess() {}
 void CAgoraAudioJsWrapper::onMediaEngineStartCallSuccess() {
 }
 /**
@@ -555,25 +776,93 @@ void CAgoraAudioJsWrapper::onMediaEngineStartCallSuccess() {
 * You should move renew of token logic into this callback.
 */
 void CAgoraAudioJsWrapper::onRequestToken() {
+    CCLOG("[Agora]:onRequestToken ");
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onRequestToken", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
 
 
 void CAgoraAudioJsWrapper::onFirstLocalAudioFrame(int elapsed) {
-    (void)elapsed;
+
+    CCLOG("[Agora]:onFirstLocalAudioFrame : %d", elapsed);
+
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onFirstLocalAudioFrame", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            
+            args.push_back(se::Value((int)elapsed));
+       
+            func.toObject()->call(args, _refObj);
+        }
+    });
+    
 }
 
 
 void CAgoraAudioJsWrapper::onFirstRemoteAudioFrame(uid_t userId, int elapsed) {
-    (void)userId;
-    (void)elapsed;
+    
+    CCLOG("[Agora]:onFirstRemoteAudioFrame : %u, %d", userId, elapsed);
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onFirstRemoteAudioFrame", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            
+            args.push_back(se::Value((uid_t)userId));
+            args.push_back(se::Value((int)elapsed));
+            
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
 
 void CAgoraAudioJsWrapper::onActiveSpeaker(uid_t userId) {
-    (void)userId;
+    CCLOG("[Agora]:onActiveSpeaker : %u", userId);
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onActiveSpeaker", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            
+            args.push_back(se::Value((uid_t)userId));
+            
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
 
 
 void CAgoraAudioJsWrapper::onClientRoleChanged(CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole) {
+    CCLOG("[Agora]:onClientRoleChanged : %d, %d", oldRole, newRole);
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onClientRoleChanged", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            
+            args.push_back(se::Value((int)oldRole));
+            args.push_back(se::Value((int)newRole));
+            
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
 
 void CAgoraAudioJsWrapper::onAudioDeviceVolumeChanged(MEDIA_DEVICE_TYPE deviceType, int volume, bool muted) {
@@ -591,8 +880,7 @@ void CAgoraAudioJsWrapper::onStreamUnpublished(const char *url) {
     (void)url;
 }
 
-void CAgoraAudioJsWrapper::onTranscodingUpdated() {
-}
+void CAgoraAudioJsWrapper::onTranscodingUpdated() {}
 
 void CAgoraAudioJsWrapper::onStreamInjectedStatus(const char* url, uid_t userId, int status) {
     (void)url;
@@ -601,18 +889,32 @@ void CAgoraAudioJsWrapper::onStreamInjectedStatus(const char* url, uid_t userId,
 }
 
 void CAgoraAudioJsWrapper::onAudioRoutingChanged(int routing) {
-	(void)routing;
+    CCLOG("[Agora]:onAudioRoutingChanged : %d", routing);
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onAudioRoutingChanged", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            
+            args.push_back(se::Value((int)routing));
+            
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
 
 
 void CAgoraAudioJsWrapper::onRemoteAudioTransportStats(
     uid_t uid, unsigned short delay, unsigned short lost,
     unsigned short rxKBitRate) {
-    (void)uid;
-    (void)delay;
-    (void)lost;
-    (void)rxKBitRate;
+        (void)uid;
+        (void)delay;
+        (void)lost;
+        (void)rxKBitRate;
 }
+
 
 
 void CAgoraAudioJsWrapper::onMicrophoneEnabled(bool enabled) {
@@ -671,8 +973,9 @@ static bool js_cocos2dx_extension_agoraAudio_joinChannel(se::State& s)
 
         uint32_t uid;
         ok &= seval_to_uint32(args[3], &uid);
-   
+        CCLOG("[Agora] joinChannel ");
         int ret = cobj->joinChannel(token.c_str(), channelId.c_str(), info.c_str(), uid);
+        CCLOG("[Agora] joinChannel done");
         int32_to_seval(ret, &s.rval());
         return true;
     }
