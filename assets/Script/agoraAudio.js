@@ -14,13 +14,22 @@ var agoraAudio_module = {
     addTips:function(strTips, errcode)
     {
         var err = errcode != undefined? errcode: 0;
-        var event = new cc.EventCustom(this.AGORAEVT.evt_tips);
+        // var event = new cc.EventCustom(this.AGORAEVT.evt_tips);
+        // var p = {
+        //     msg: strTips,
+        //     error: err,
+        // };
+        // event.setUserData(p);
+        // cc.eventManager.dispatchEvent(event);
+        let event = new cc.Event(action,true);
+      
         var p = {
             msg: strTips,
             error: err,
         };
-        event.setUserData(p);
-        cc.eventManager.dispatchEvent(event);
+        event["data"] = p;
+        cc.systemEvent.dispatchEvent(event);
+
     },
 
     jSuccessNotify:function(channel, uid, elapsed)
@@ -64,7 +73,7 @@ var agoraAudio_module = {
             this.agoraAudioInst.onJoinChannelSuccess = function(channel,  uid, elapsed){
                 cc.log("[js] onJoinChannelSuccess, channel:%s,uid :%d, elapsed : %d !", channel, uid, elapsed);    
               
-                // self.addTips(" Join Channel Successfully !");
+                self.addTips(" Join Channel Successfully !");
                 // self.jSuccessNotify(channel,  uid, elapsed);
             };
 
