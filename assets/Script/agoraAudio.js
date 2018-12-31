@@ -21,8 +21,8 @@ var agoraAudio_module = {
         // };
         // event.setUserData(p);
         // cc.eventManager.dispatchEvent(event);
-        let event = new cc.Event(action,true);
-      
+
+        let event = new cc.Event(this.AGORAEVT.evt_tips, true);
         var p = {
             msg: strTips,
             error: err,
@@ -58,7 +58,7 @@ var agoraAudio_module = {
         cc.eventManager.dispatchEvent(event);
     },
     
-    initAgoraAudio:function(appid){
+    createEngine:function(appid){
 
         if(this.agoraAudioInst == null)
         {
@@ -78,9 +78,29 @@ var agoraAudio_module = {
             };
 
             this.agoraAudioInst.onLeaveChannel = function (totalDuration, txBytes, rxBytes,txKBitRate,rxKBitRate,txAudioKBitRate,rxAudioKBitRate,txVideoKBitRate,rxVideoKBitRate,users,cpuTotalUsage,cpuAppUsage){
-                cc.log("[js]onLeaveChannel, totalDuration:%s,utxBytes :%d, rxBytes : %d !\n", totalDuration, txBytes, rxBytes);
+                cc.log("[js]onLeaveChannel, totalDuration:%s,utxBytes :%d, rxBytes : %d !", totalDuration, txBytes, rxBytes);
                 // self.addTips(" Leave Channel Successfully !");
                 // self.lSuccessNotify(totalDuration, txBytes, rxBytes,txKBitRate);
+            };
+
+            this.agoraAudioInst.onUserMuteAudio = function (userId,  muted){
+                cc.log("[js]onUserMuteAudio, userId:%d, muted :%d !", userId, muted);
+            };
+
+            this.agoraAudioInst.onAudioVolumeIndication = function (speakers,  speakerNumber, totalVolume){
+                cc.log("[js]onAudioVolumeIndication, speakerNumber:%d, totalVolume :%d !", speakerNumber, totalVolume);
+                if (speakerNumber == 0) {
+                    cc.log("[js] callback of Remote Speakers"); 
+                }
+
+                for (var i = 0;i <speakerNumber; i++) {
+                    if (speakers[i].uid == 0 && speakerNumber == 1) {
+                        cc.log("[js] Local Speaker[%d], uid:%d, volume : %d", i, speakers[i].uid, speakers[i].volume);
+                        return;
+                    }else{
+                        cc.log("[js] Remote Speaker[%d], uid:%d, volume : %d", i, speakers[i].uid, speakers[i].volume);
+                    }
+                }
             };
         }
     },

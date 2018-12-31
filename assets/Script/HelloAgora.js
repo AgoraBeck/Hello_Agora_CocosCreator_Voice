@@ -61,6 +61,10 @@ cc.Class({
 
         this.updateUI(true);
     },
+    onDestroy () {
+        this.removeEvent();
+        console.log("Login页面销毁");
+    },
 
     updateUI: function(bInited){
         // this.btnJoin.interactable = !bInited;
@@ -75,43 +79,84 @@ cc.Class({
 
     },
 
-    initEvent:function(){      
-        var mythis = this;
-        
-        var self = this;
-
-        cc.eventManager.addListener({
-            event: cc.EventListener.CUSTOM,   
-            eventName: agoraAudio.AGORAEVT.evt_tips,            
-            
-            callback: function(event){
-                var obj = event.getUserData();
-                var s = obj.msg;
-                if(obj.error != 0){
-                    s += "[errorcode]" + obj.error;
-                }
-                self.label.string = s;
-            }
-        },this.node);
-
-        cc.eventManager.addListener({
-            event:cc.EventListener.CUSTOM,
-            eventName:agoraAudio.AGORAEVT.evt_jSuccess,
-            callback:function (event){
-                self.updateUI(true);       
-            }
-        },this.node);
-
-        cc.eventManager.addListener({
-            event:cc.EventListener.CUSTOM,
-            eventName: agoraAudio.AGORAEVT.evt_lSuccess,
-            callback:function (event){    
-                var msg = event.getUserData();
-                self.updateUI(false);                                      
-            }
-        },this.node);
+    initEvent:function(){              
+        cc.systemEvent.on(agoraAudio.AGORAEVT.evt_tips,this.onEvent,this);
+        cc.systemEvent.on(agoraAudio.AGORAEVT.evt_jSuccess,this.onEvent,this);
+        cc.systemEvent.on(agoraAudio.AGORAEVT.evt_lSuccess,this.onEvent,this);
 
     },
+
+    removeEvent:function(){    
+        cc.systemEvent.off(agoraAudio.AGORAEVT.evt_tips,this.onEvent);
+        cc.systemEvent.off(agoraAudio.AGORAEVT.evt_jSuccess,this.onEvent);
+        cc.systemEvent.off(agoraAudio.AGORAEVT.evt_lSuccess,this.onEvent);
+    },
+
+    onEvent: function(event){
+        let eventData = event.data;
+        switch (event.type){
+            case agoraAudio.AGORAEVT.evt_tips:
+                cc.log("beck: " +  event.data.msg);
+                var s = event.data.msg
+                if(event.data.error != 0){
+                    s += "[errorcode]" + obj.error;
+                }
+                this.label.string  = s;
+                break;
+
+            case agoraAudio.AGORAEVT.evt_jSuccess:
+                var s = event.data.msg
+                if(event.data.error != 0){
+                    s += "[errorcode]" + obj.error;
+                }
+                this.label.string  = s;
+
+                break;
+
+            case agoraAudio.AGORAEVT.evt_lSuccess:
+                var s = event.data.msg
+                if(event.data.error != 0){
+                    s += "[errorcode]" + obj.error;
+                }
+                this.label.string  = s;               
+
+                break;
+
+        }
+
+    },
+
+
+        // cc.systemEvent.on(agoraAudio.AGORAEVT.evt_tips, function(e){ 
+        //     cc.log("beck: " +  e.data.msg);
+        //     // var obj = event.getUserData();
+        //     var s = e.data.msg
+        //     if(e.data.error != 0){
+        //         s += "[errorcode]" + obj.error;
+        //     }
+        //     this.label.string  = s;
+            
+        // }, this);
+
+
+        // cc.eventManager.addListener({
+        //     event:cc.EventListener.CUSTOM,
+        //     eventName:agoraAudio.AGORAEVT.evt_jSuccess,
+        //     callback:function (event){
+        //         self.updateUI(true);       
+        //     }
+        // },this.node);
+
+        // cc.eventManager.addListener({
+        //     event:cc.EventListener.CUSTOM,
+        //     eventName: agoraAudio.AGORAEVT.evt_lSuccess,
+        //     callback:function (event){    
+        //         var msg = event.getUserData();
+        //         self.updateUI(false);                                      
+        //     }
+        // },this.node);
+
+    // },
 
     // called every frame
     update: function (dt) {
@@ -119,8 +164,8 @@ cc.Class({
     },
 
     btnInitializeClick: function (event, customEventData) {
-        agoraAudio.initAgoraAudio("4c51ad802859440cbfb89eb75919d9ed"); // input: APPID
-        this.label.string = "called initAgoraAudio ...";
+        agoraAudio.createEngine("4c51ad802859440cbfb89eb75919d9ed"); // input: APPID
+        this.label.string = "called createEngine ...";
     },
 
 

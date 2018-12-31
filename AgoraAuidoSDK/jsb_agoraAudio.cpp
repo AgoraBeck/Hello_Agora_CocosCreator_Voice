@@ -1,7 +1,7 @@
 //
 //  jsb_agoraAudio.cpp
 //
-//  Created by becklee on 18/3/3
+//  Created by on 18/3/3
 //
 //
 
@@ -40,13 +40,14 @@
 #define AGORA_CALL
 #endif
 
+#define   MAX_NUM  17
 #if defined(__APPLE__)
      #include <AgoraAudioKit/IAgoraRtcEngine.h>
 #elif defined(__ANDROID__)
     #include "IAgoraRtcEngine.h"
     // #include "../../../../../AgoraAuidoSDK/libs/Android/include/IAgoraRtcEngine.h"
     #include <android/log.h>
-    #define LOG_TAG "beck-debug"
+    #define LOG_TAG "android-debug"
     #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
 #else
 
@@ -444,6 +445,9 @@ void CAgoraAudioJsWrapper::onRejoinChannelSuccess(const char* channel, uid_t use
 
 void CAgoraAudioJsWrapper::onWarning(int warn, const char* msg) {
     CCLOG("[Agora]:onWarning %d, %s", warn, msg);
+    if (msg == nullptr) {
+        return;
+    }
     std::string strMsg = msg;
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -463,6 +467,9 @@ void CAgoraAudioJsWrapper::onWarning(int warn, const char* msg) {
 
 void CAgoraAudioJsWrapper::onError(int err, const char* msg) {
     CCLOG("[Agora]:onError %d, %s", err, msg);
+    if (msg == nullptr) {
+        return;
+    }
     std::string strMsg = msg;
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -500,12 +507,45 @@ void CAgoraAudioJsWrapper::onAudioQuality(uid_t userId, int quality, unsigned sh
 }
 
 void CAgoraAudioJsWrapper::onAudioVolumeIndication(const AudioVolumeInfo* speakers, unsigned int speakerNumber, int totalVolume) {
-    (void)speakers;
-    (void)speakerNumber;
-    (void)totalVolume;
+    CCLOG("[Agora]:onAudioVolumeIndication %d, %d", speakerNumber, totalVolume);
+    if(!speakerNumber){
+        return;
+    }
+    
+    AudioVolumeInfo speakersArr[MAX_NUM] = {0,};
+    memcpy(speakersArr, speakers, speakerNumber*sizeof(AudioVolumeInfo));
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onAudioVolumeIndication", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            
+            se::Value out = se::Value::Null;
+            se::HandleObject arr(se::Object::createArrayObject(speakerNumber));
+            for (uint32_t i = 0; i < speakerNumber; ++i){
+                se::Value uidOut = se::Value::Null;
+                uint32_to_seval(speakersArr[i].uid, &uidOut);
+                
+                se::Value volumeOut = se::Value::Null;
+                uint8_to_seval(speakersArr[i].volume, &volumeOut);
+                
+                se::HandleObject obj(se::Object::createPlainObject());
+                obj->setProperty("uid",uidOut);
+                obj->setProperty("volume", volumeOut);
+                out.setObject(obj);
+                arr->setArrayElement(i, se::Value(out));
+            }
+            
+            args.push_back(se::Value(arr));
+            args.push_back(se::Value(speakerNumber));
+            args.push_back(se::Value(totalVolume));
+
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
-
-
 
 void CAgoraAudioJsWrapper::onRtcStats(const RtcStats& stats) {
     CCLOG("[Agora]:onRtcStats %d, %d",  stats.txBytes, stats.rxBytes);
@@ -536,6 +576,9 @@ void CAgoraAudioJsWrapper::onRtcStats(const RtcStats& stats) {
 
 void CAgoraAudioJsWrapper::onAudioDeviceStateChanged(const char* deviceId, int deviceType, int deviceState) {
     CCLOG("[Agora]:onAudioDeviceStateChanged %s, %d", deviceId, deviceType);
+    if (deviceId == nullptr) {
+        return;
+    }
     std::string strDeviceId = deviceId;
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -675,10 +718,21 @@ void CAgoraAudioJsWrapper::onUserOffline(uid_t userId, USER_OFFLINE_REASON_TYPE 
 }
 
 void CAgoraAudioJsWrapper::onUserMuteAudio(uid_t userId, bool muted) {
-    (void)userId;
-    (void)muted;
+    CCLOG("[Agora]:onUserMuteAudio %u, %d", userId, muted);
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onUserMuteAudio", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+        
+            args.push_back(se::Value((uid_t)userId));
+            args.push_back(se::Value(muted));
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
-
 
 void CAgoraAudioJsWrapper::onApiCallExecuted(int err, const char* api, const char* result) {
     CCLOG("[Agora]:onApiCallExecuted : %d, %s, %s", err, api, result);
@@ -749,7 +803,6 @@ void CAgoraAudioJsWrapper::onConnectionBanned() {
 void CAgoraAudioJsWrapper::onRefreshRecordingServiceStatus(int status) {
     (void)status;
 }
-
 
 void CAgoraAudioJsWrapper::onStreamMessage(uid_t userId, int streamId, const char* data, size_t length) {
     (void)userId;
@@ -866,9 +919,22 @@ void CAgoraAudioJsWrapper::onClientRoleChanged(CLIENT_ROLE_TYPE oldRole, CLIENT_
 }
 
 void CAgoraAudioJsWrapper::onAudioDeviceVolumeChanged(MEDIA_DEVICE_TYPE deviceType, int volume, bool muted) {
-    (void)deviceType;
-    (void)volume;
-    (void)muted;
+    CCLOG("[Agora]:onAudioDeviceVolumeChanged : %d, %d", deviceType, volume);
+    
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onAudioDeviceVolumeChanged", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            
+            args.push_back(se::Value((int)deviceType));
+            args.push_back(se::Value((int)volume));
+            args.push_back(se::Value(muted));
+            
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
 
 void CAgoraAudioJsWrapper::onStreamPublished(const char *url, int error) {
@@ -975,6 +1041,15 @@ static bool js_cocos2dx_extension_agoraAudio_joinChannel(se::State& s)
         ok &= seval_to_uint32(args[3], &uid);
         CCLOG("[Agora] joinChannel ");
         int ret = cobj->joinChannel(token.c_str(), channelId.c_str(), info.c_str(), uid);
+        /* beck test，测试, 开始 */
+        
+        cobj->enableAudioVolumeIndication(500, 3);
+        
+        /* beck test，测试 */
+        
+        
+        
+        
         CCLOG("[Agora] joinChannel done");
         int32_to_seval(ret, &s.rval());
         return true;
@@ -1369,7 +1444,7 @@ bool js_register_cocos2dx_extension_agoraAudio(se::Object* obj)
     cls->defineFunction("muteRemoteAudioStream", _SE(js_cocos2dx_extension_agoraAudio_muteRemoteAudioStream));
     cls->defineFunction("setDefaultAudioRouteToSpeakerphone", _SE(js_cocos2dx_extension_agoraAudio_setDefaultAudioRouteToSpeakerphone));
     cls->defineFunction("setEnableSpeakerphone", _SE(js_cocos2dx_extension_agoraAudio_setEnableSpeakerphone));
-//
+
     cls->defineFinalizeFunction(_SE(js_agoraAudio_finalize));
     cls->install();
 
