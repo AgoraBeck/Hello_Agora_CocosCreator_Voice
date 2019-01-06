@@ -1,8 +1,6 @@
 //
 //  jsb_agoraAudio.cpp
-//
 //  Created by on 18/3/3
-//
 //
 
 #include "jsb_agoraAudio.h"
@@ -400,19 +398,46 @@ void CAgoraAudioJsWrapper:: onLeaveChannel(const RtcStats& stats)
             se::AutoHandleScope hs;
             
             se::ValueArray args;
-//            args.push_back(se::Value((int)stats.totalDuration));
-            args.push_back(se::Value((int)stats.txBytes));
-            args.push_back(se::Value((int)stats.rxBytes));
-            args.push_back(se::Value((int)stats.txKBitRate));
-            args.push_back(se::Value((int)stats.rxKBitRate));
-            args.push_back(se::Value((int)stats.txAudioKBitRate));
-            args.push_back(se::Value((int)stats.rxAudioKBitRate));
-            args.push_back(se::Value((int)stats.txVideoKBitRate));
-            args.push_back(se::Value((int)stats.rxVideoKBitRate));
-//            args.push_back(se::Value((int)stats.users));
-            args.push_back(se::Value((double)stats.cpuTotalUsage));
-            args.push_back(se::Value((double)stats.cpuAppUsage));
             
+            se::HandleObject obj(se::Object::createPlainObject());
+            se::Value duration = se::Value::Null;
+            se::Value txBytes = se::Value::Null;
+            se::Value rxBytes = se::Value::Null;
+            se::Value txKBitRate = se::Value::Null;
+            se::Value rxKBitRate = se::Value::Null;
+            se::Value txAudioKBitRate = se::Value::Null;
+            se::Value rxAudioKBitRate = se::Value::Null;
+            se::Value cpuTotalUsage = se::Value::Null;
+            se::Value cpuAppUsage = se::Value::Null;
+            se::Value lastmileDelay = se::Value::Null;
+            se::Value userCount = se::Value::Null;
+ 
+            uint32_to_seval(stats.duration, &duration);
+            uint32_to_seval(stats.txBytes, &txBytes);
+            uint32_to_seval(stats.rxBytes, &rxBytes);
+            uint16_to_seval(stats.txKBitRate, &txKBitRate);
+            uint16_to_seval(stats.rxKBitRate, &rxKBitRate);
+            uint16_to_seval(stats.txAudioKBitRate, &txAudioKBitRate);
+            uint16_to_seval(stats.rxAudioKBitRate, &rxAudioKBitRate);
+            double_to_seval(stats.cpuTotalUsage, &cpuTotalUsage);
+            double_to_seval(stats.cpuAppUsage, &cpuAppUsage);
+            uint16_to_seval(stats.lastmileDelay, &lastmileDelay);
+            uint32_to_seval(stats.userCount, &userCount);
+        
+            obj->setProperty("duration",duration);
+            obj->setProperty("txBytes",txBytes);
+            obj->setProperty("rxBytes", rxBytes);
+            obj->setProperty("txKBitRate", txKBitRate);
+            obj->setProperty("rxKBitRate", rxKBitRate);
+            obj->setProperty("txAudioKBitRate", txAudioKBitRate);
+            obj->setProperty("rxAudioKBitRate", rxAudioKBitRate);
+            obj->setProperty("cpuTotalUsage",cpuTotalUsage);
+            obj->setProperty("cpuAppUsage", cpuAppUsage);
+            obj->setProperty("lastmileDelay",lastmileDelay);
+            obj->setProperty("userCount",userCount);
+            
+            args.push_back(se::Value(obj));
+    
             func.toObject()->call(args, _refObj);
         }
     });
@@ -556,16 +581,45 @@ void CAgoraAudioJsWrapper::onRtcStats(const RtcStats& stats) {
             se::AutoHandleScope hs;
             
             se::ValueArray args;
-            args.push_back(se::Value((int)stats.txBytes));
-            args.push_back(se::Value((int)stats.rxBytes));
-            args.push_back(se::Value((int)stats.txKBitRate));
-            args.push_back(se::Value((int)stats.rxKBitRate));
-            args.push_back(se::Value((int)stats.txAudioKBitRate));
-            args.push_back(se::Value((int)stats.rxAudioKBitRate));
-            args.push_back(se::Value((int)stats.txVideoKBitRate));
-            args.push_back(se::Value((int)stats.rxVideoKBitRate));
-            args.push_back(se::Value((double)stats.cpuTotalUsage));
-            args.push_back(se::Value((double)stats.cpuAppUsage));
+            
+            se::HandleObject obj(se::Object::createPlainObject());
+            se::Value duration = se::Value::Null;
+            se::Value txBytes = se::Value::Null;
+            se::Value rxBytes = se::Value::Null;
+            se::Value txKBitRate = se::Value::Null;
+            se::Value rxKBitRate = se::Value::Null;
+            se::Value txAudioKBitRate = se::Value::Null;
+            se::Value rxAudioKBitRate = se::Value::Null;
+            se::Value cpuTotalUsage = se::Value::Null;
+            se::Value cpuAppUsage = se::Value::Null;
+            se::Value lastmileDelay = se::Value::Null;
+            se::Value userCount = se::Value::Null;
+            
+            uint32_to_seval(stats.duration, &duration);
+            uint32_to_seval(stats.txBytes, &txBytes);
+            uint32_to_seval(stats.rxBytes, &rxBytes);
+            uint16_to_seval(stats.txKBitRate, &txKBitRate);
+            uint16_to_seval(stats.rxKBitRate, &rxKBitRate);
+            uint16_to_seval(stats.txAudioKBitRate, &txAudioKBitRate);
+            uint16_to_seval(stats.rxAudioKBitRate, &rxAudioKBitRate);
+            double_to_seval(stats.cpuTotalUsage, &cpuTotalUsage);
+            double_to_seval(stats.cpuAppUsage, &cpuAppUsage);
+            uint16_to_seval(stats.lastmileDelay, &lastmileDelay);
+            uint32_to_seval(stats.userCount, &userCount);
+            
+            obj->setProperty("duration",duration);
+            obj->setProperty("txBytes",txBytes);
+            obj->setProperty("rxBytes", rxBytes);
+            obj->setProperty("txKBitRate", txKBitRate);
+            obj->setProperty("rxKBitRate", rxKBitRate);
+            obj->setProperty("txAudioKBitRate", txAudioKBitRate);
+            obj->setProperty("rxAudioKBitRate", rxAudioKBitRate);
+            obj->setProperty("cpuTotalUsage",cpuTotalUsage);
+            obj->setProperty("cpuAppUsage", cpuAppUsage);
+            obj->setProperty("lastmileDelay",lastmileDelay);
+            obj->setProperty("userCount",userCount);
+            
+            args.push_back(se::Value(obj));
             
             func.toObject()->call(args, _refObj);
         }
@@ -646,6 +700,7 @@ void CAgoraAudioJsWrapper::onAudioEffectFinished(int soundId) {
             se::ScriptEngine::getInstance()->clearException();
             se::AutoHandleScope hs;
             se::ValueArray args;
+            args.push_back(se::Value((int)soundId));
             func.toObject()->call(args, _refObj);
         }
     });
@@ -970,7 +1025,6 @@ void CAgoraAudioJsWrapper::onAudioRoutingChanged(int routing) {
     });
 }
 
-
 void CAgoraAudioJsWrapper::onRemoteAudioTransportStats(
     uid_t uid, unsigned short delay, unsigned short lost,
     unsigned short rxKBitRate) {
@@ -980,12 +1034,21 @@ void CAgoraAudioJsWrapper::onRemoteAudioTransportStats(
         (void)rxKBitRate;
 }
 
-
-
 void CAgoraAudioJsWrapper::onMicrophoneEnabled(bool enabled) {
-	(void)enabled;
+    CCLOG("[Agora]:onMicrophoneEnabled,enabled : %d",  enabled);
+        
+    Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
+        se::Value func;
+        if (_refObj->getProperty("onMicrophoneEnabled", &func)) {
+            se::ScriptEngine::getInstance()->clearException();
+            se::AutoHandleScope hs;
+            se::ValueArray args;
+            
+            args.push_back(se::Value(enabled));
+            func.toObject()->call(args, _refObj);
+        }
+    });
 }
-
 
 #define AGORA_CHECK(error) { int code = error; if (code != 0) CCLOG("[Agora Error] %s", agora()->getErrorDescription(code)); }
 
@@ -1038,10 +1101,7 @@ static bool js_cocos2dx_extension_agoraAudio_joinChannel(se::State& s)
         ok &= seval_to_uint32(args[3], &uid);
 
         int ret = cobj->joinChannel(token.c_str(), channelId.c_str(), info.c_str(), uid);
-        /* beck test，测试, 开始 */
-        cobj->enableAudioVolumeIndication(500, 3);
-        /* beck test，测试 */
-        
+
         int32_to_seval(ret, &s.rval());
         return true;
     }
@@ -2449,9 +2509,6 @@ SE_BIND_FINALIZE_FUNC(js_agoraAudio_finalize)
 static bool js_cocos2dx_extension_agoraAudio_constructor(se::State& s)
 {
     CCLOG("[Agora] constructor");
-//    const auto& args = s.args();
-    
-//    size_t argc = args.size();
     
     if (g_SingleInstance == NULL){
         g_SingleInstance = new CAgoraAudioJsWrapper();

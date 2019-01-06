@@ -1,57 +1,62 @@
 # cocosCreator 集成使用指南
 
-## cocosCreator 
 
-### 适配版本:  
-	cocosCreator 2.0.6
-
-### cocoscreator app 编译:
+## 1.cocoscreator 编译:
 
 * 编译配置
 
-	cocosCreator插件Preferenec里的 Native Develop下配置本地工具路径： 
+	Mac上cocosCreator插件Preference里的Native Develop下配置本地工具路径:
 
-> NDK root
+	> NDK root
 
-> Android SDK Root.
+	> Android SDK Root.
 
-翻墙软件建议关掉，可能会遇到IPC错误。
+	VPN软件建议关掉，可能会遇到IPC错误。
 
 *  编译
 
 	在运行demo时，选择cocosCreator工具栏的"Project" -> "Build"后，会弹出编译窗口。
 
-	分别"Build" -> “Compile”，Android， iOS的平台demo。
+	分别"Build" -> “Compile”，Android， iOS平台的demo。
 	
-	再对AgoraAudioSDK的插件进行导入和配置。
-	
-	建议先调好iOS。 
+	再对AgoraAudioSDK的插件在Android、iOS上进行分别导入、配置，编译。
 
-
-## 开发环境集成
+## 2.开发环境集成
 
 Cocos2d-js开发环境生成的目录结构如下图所示.
 
-< 图呢 >
-
-< 图呢 >
-
-< 图呢 >
+![](png/struct.png)
 
 
 AgoraAuidoSDK（“libs”文件夹以及JSB封装c++ 文件），这个目录下包含了Android和iOS两个平台所需的所有C++头文件和库文件。
 
-将AgoraAuidoSDK目录复制到： 
+
+| 文件 |描述 | 
+| ------ | ------ | 
+| jsb_agoraAudio.cpp |  C++ API JSB 封装 | 
+| jsb_agoraAudio.h   |  C++ APIJSB 封装头文件 | 
+| iOS 目录   | [互动游戏 SDK:iOS 语音版V2.2](https://docs.agora.io/cn/Agora%20Platform/downloads)，并按照如图放置| 
+| Android目录   |[互动游戏 SDK:Android 语音版V2.2](https://docs.agora.io/cn/Agora%20Platform/downloads)，并按照如图放置| 
+
+
+![](png/AgoraAudioSDK.png)
+
+cocoscreator Demo，构建、编译后，将AgoraAuidoSDK目录复制到： 
 
 > build/jsb-link/frameworks/runtime-src/
+> 
+> 或者
+> 
+> build/jsb-default/frameworks/runtime-src/
 
 
+runtime-src/ 下会有不同平台的工程。
 
-## Android系统Android Studio开发环境配置
+## 3.Android Studio开发环境配置
 
 ### 修改proj.android-studio/jni/Android.mk
 
-对应位置增加指定内容，分别对游密实时语音SDK的动态库进行预编译处理、添加头文件路径、链接动态库。
+对应位置增加指定内容，分别对Agora实时语音SDK的动态库进行预编译处理、添加头文件路径、链接动态库。
 
 
 ```
@@ -138,7 +143,7 @@ $(call import-module, cocos)
 
 
 
-### 修改build.graddle
+### 修改build.graddle <可选>
 
 ```
 //set so supported. Dependent on your requirements.
@@ -187,7 +192,7 @@ public class AppActivity extends Cocos2dxActivity {
 
 
 
-## iOS集成
+## 4. iOS集成
 
 
 #### 导入文件到xcode工程
@@ -239,13 +244,11 @@ Build Settings -> Search Paths -> Framework Search Paths中添加:
 
 ### 添加录音权限
 
-为iOS10以上版本添加录音权限配置：
+为iOS10以上版本添加录音权限配置 ：首次录音时会向用户申请权限。
 
-选择TARGETS里的info，在Custom iOS Target Properties下新加一个key。
+选择TARGETS里的info，在Custom iOS Target Properties下新加一个key。选择Privacy-Microphone Usage Description，Value为字符串(授权弹窗出现时提示给用户)。
 
-选择Privacy-Microphone Usage Description，Value为字符串(授权弹窗出现时提示给用户)。
 
-首次录音时会向用户申请权限。
 
 	
 
