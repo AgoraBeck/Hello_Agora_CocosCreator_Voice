@@ -1,9 +1,9 @@
 //
-//  jsb_agoraAudio.cpp
+//  jsb_agoraCreator.cpp
 //  Created by on 18/3/3
 //
 
-#include "jsb_agoraAudio.h"
+#include "jsb_agoraCreator.h"
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT || CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS || CC_TARGET_PLATFORM == CC_PLATFORM_MAC || CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
 #include "scripting/js-bindings/manual/jsb_conversions.hpp"
 #include "scripting/js-bindings/manual/jsb_global.h"
@@ -58,17 +58,17 @@
 using namespace cocos2d;
 using namespace agora::rtc;
 
-class CAgoraAudioJsWrapper;
-CAgoraAudioJsWrapper* g_SingleInstance;
+class CagoraCreatorJsWrapper;
+CagoraCreatorJsWrapper* g_SingleInstance;
 
-se::Object *js_cocos2dx_agoraAudio_prototype = nullptr;
-se::Class *js_cocos2dx_agoraAudio_class = nullptr;
+se::Object *js_cocos2dx_agoraCreator_prototype = nullptr;
+se::Class *js_cocos2dx_agoraCreator_class = nullptr;
 
-class CAgoraAudioJsWrapper:public IRtcEngineEventHandler {
+class CagoraCreatorJsWrapper:public IRtcEngineEventHandler {
 public:
-//    static CAgoraAudioJsWrapper* getInstance();
-    CAgoraAudioJsWrapper();
-    ~CAgoraAudioJsWrapper();
+//    static CagoraCreatorJsWrapper* getInstance();
+    CagoraCreatorJsWrapper();
+    ~CagoraCreatorJsWrapper();
     
 
 public:
@@ -356,15 +356,15 @@ public:
     virtual void onMicrophoneEnabled(bool enabled) ;    
 };
 
-CAgoraAudioJsWrapper::CAgoraAudioJsWrapper()
+CagoraCreatorJsWrapper::CagoraCreatorJsWrapper()
 {
 }
 
-CAgoraAudioJsWrapper::~CAgoraAudioJsWrapper()
+CagoraCreatorJsWrapper::~CagoraCreatorJsWrapper()
 {
 }
 
-void CAgoraAudioJsWrapper::onJoinChannelSuccess(const char* channel, uid_t userId, int elapsed)
+void CagoraCreatorJsWrapper::onJoinChannelSuccess(const char* channel, uid_t userId, int elapsed)
 {
     CCLOG("[Agora]:onJoinChannelSuccess %s, %u, %d", channel, userId, elapsed);
     static char channelName[0x100];
@@ -387,7 +387,7 @@ void CAgoraAudioJsWrapper::onJoinChannelSuccess(const char* channel, uid_t userI
     return ;
 }
 
-void CAgoraAudioJsWrapper:: onLeaveChannel(const RtcStats& stats)
+void CagoraCreatorJsWrapper:: onLeaveChannel(const RtcStats& stats)
 {
     CCLOG("[Agora]:onLeaveChannel %d, %d",  stats.txBytes, stats.rxBytes);
     
@@ -445,7 +445,7 @@ void CAgoraAudioJsWrapper:: onLeaveChannel(const RtcStats& stats)
     return ;
 }
 
-void CAgoraAudioJsWrapper::onRejoinChannelSuccess(const char* channel, uid_t userId, int elapsed) {
+void CagoraCreatorJsWrapper::onRejoinChannelSuccess(const char* channel, uid_t userId, int elapsed) {
 
     CCLOG("[Agora]:onRejoinChannelSuccess %s, %u, %d", channel, userId, elapsed);
     static char channelName[0x100];
@@ -468,11 +468,11 @@ void CAgoraAudioJsWrapper::onRejoinChannelSuccess(const char* channel, uid_t use
 
 }
 
-void CAgoraAudioJsWrapper::onWarning(int warn, const char* msg) {
-    CCLOG("[Agora]:onWarning %d, %s", warn, msg);
+void CagoraCreatorJsWrapper::onWarning(int warn, const char* msg) {
     if (msg == nullptr) {
         return;
     }
+    CCLOG("[Agora]:onWarning %d, %s", warn, msg);
     std::string strMsg = msg;
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -489,7 +489,7 @@ void CAgoraAudioJsWrapper::onWarning(int warn, const char* msg) {
     return ;
 }
 
-void CAgoraAudioJsWrapper::onError(int err, const char* msg) {
+void CagoraCreatorJsWrapper::onError(int err, const char* msg) {
     if (msg == nullptr) {
         return;
     }
@@ -511,7 +511,7 @@ void CAgoraAudioJsWrapper::onError(int err, const char* msg) {
     return ;
 }
 
-void CAgoraAudioJsWrapper::onAudioQuality(uid_t userId, int quality, unsigned short delay, unsigned short lost) {
+void CagoraCreatorJsWrapper::onAudioQuality(uid_t userId, int quality, unsigned short delay, unsigned short lost) {
     CCLOG("[Agora]:onAudioQuality %u, %d", userId, quality);
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -530,7 +530,7 @@ void CAgoraAudioJsWrapper::onAudioQuality(uid_t userId, int quality, unsigned sh
     });
 }
 
-void CAgoraAudioJsWrapper::onAudioVolumeIndication(const AudioVolumeInfo* speakers, unsigned int speakerNumber, int totalVolume) {
+void CagoraCreatorJsWrapper::onAudioVolumeIndication(const AudioVolumeInfo* speakers, unsigned int speakerNumber, int totalVolume) {
     CCLOG("[Agora]:onAudioVolumeIndication %d, %d", speakerNumber, totalVolume);
     if(!speakerNumber){
         return;
@@ -571,7 +571,7 @@ void CAgoraAudioJsWrapper::onAudioVolumeIndication(const AudioVolumeInfo* speake
     });
 }
 
-void CAgoraAudioJsWrapper::onRtcStats(const RtcStats& stats) {
+void CagoraCreatorJsWrapper::onRtcStats(const RtcStats& stats) {
     CCLOG("[Agora]:onRtcStats %d, %d",  stats.txBytes, stats.rxBytes);
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -627,7 +627,7 @@ void CAgoraAudioJsWrapper::onRtcStats(const RtcStats& stats) {
 }
 
 
-void CAgoraAudioJsWrapper::onAudioDeviceStateChanged(const char* deviceId, int deviceType, int deviceState) {
+void CagoraCreatorJsWrapper::onAudioDeviceStateChanged(const char* deviceId, int deviceType, int deviceState) {
     CCLOG("[Agora]:onAudioDeviceStateChanged %s, %d", deviceId, deviceType);
     if (deviceId == nullptr) {
         return;
@@ -649,7 +649,7 @@ void CAgoraAudioJsWrapper::onAudioDeviceStateChanged(const char* deviceId, int d
 }
 
 
-void CAgoraAudioJsWrapper::onAudioMixingFinished() {
+void CagoraCreatorJsWrapper::onAudioMixingFinished() {
     CCLOG("[Agora]:onAudioMixingFinished ");
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -663,7 +663,7 @@ void CAgoraAudioJsWrapper::onAudioMixingFinished() {
     });
 }
 
-void CAgoraAudioJsWrapper::onRemoteAudioMixingBegin() {
+void CagoraCreatorJsWrapper::onRemoteAudioMixingBegin() {
     CCLOG("[Agora]:onRemoteAudioMixingBegin ");
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -677,7 +677,7 @@ void CAgoraAudioJsWrapper::onRemoteAudioMixingBegin() {
     });
 }
 
-void CAgoraAudioJsWrapper::onRemoteAudioMixingEnd() {
+void CagoraCreatorJsWrapper::onRemoteAudioMixingEnd() {
     CCLOG("[Agora]:onRemoteAudioMixingEnd ");
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -691,7 +691,7 @@ void CAgoraAudioJsWrapper::onRemoteAudioMixingEnd() {
     });
 }
 
-void CAgoraAudioJsWrapper::onAudioEffectFinished(int soundId) {
+void CagoraCreatorJsWrapper::onAudioEffectFinished(int soundId) {
     CCLOG("[Agora]:onAudioEffectFinished ");
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -706,7 +706,7 @@ void CAgoraAudioJsWrapper::onAudioEffectFinished(int soundId) {
     });
 }
 
-void CAgoraAudioJsWrapper::onNetworkQuality(uid_t userId, int txQuality, int rxQuality) {
+void CagoraCreatorJsWrapper::onNetworkQuality(uid_t userId, int txQuality, int rxQuality) {
     CCLOG("[Agora]:onNetworkQuality %u, %d, %d", userId, txQuality,rxQuality);
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -723,7 +723,7 @@ void CAgoraAudioJsWrapper::onNetworkQuality(uid_t userId, int txQuality, int rxQ
     });
 }
 
-void CAgoraAudioJsWrapper::onLastmileQuality(int quality) {
+void CagoraCreatorJsWrapper::onLastmileQuality(int quality) {
     CCLOG("[Agora]:onLastmileQuality %d", quality);
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -739,7 +739,7 @@ void CAgoraAudioJsWrapper::onLastmileQuality(int quality) {
     });
 }
 
-void CAgoraAudioJsWrapper::onUserJoined(uid_t userId, int elapsed) {
+void CagoraCreatorJsWrapper::onUserJoined(uid_t userId, int elapsed) {
     CCLOG("[Agora]:onUserJoined %u", userId);
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -755,7 +755,7 @@ void CAgoraAudioJsWrapper::onUserJoined(uid_t userId, int elapsed) {
     });
 }
 
-void CAgoraAudioJsWrapper::onUserOffline(uid_t userId, USER_OFFLINE_REASON_TYPE reason) {
+void CagoraCreatorJsWrapper::onUserOffline(uid_t userId, USER_OFFLINE_REASON_TYPE reason) {
     CCLOG("[Agora]:onUserOffline %u", userId);
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -771,7 +771,7 @@ void CAgoraAudioJsWrapper::onUserOffline(uid_t userId, USER_OFFLINE_REASON_TYPE 
     });
 }
 
-void CAgoraAudioJsWrapper::onUserMuteAudio(uid_t userId, bool muted) {
+void CagoraCreatorJsWrapper::onUserMuteAudio(uid_t userId, bool muted) {
     CCLOG("[Agora]:onUserMuteAudio %u, %d", userId, muted);
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -788,7 +788,7 @@ void CAgoraAudioJsWrapper::onUserMuteAudio(uid_t userId, bool muted) {
     });
 }
 
-void CAgoraAudioJsWrapper::onApiCallExecuted(int err, const char* api, const char* result) {
+void CagoraCreatorJsWrapper::onApiCallExecuted(int err, const char* api, const char* result) {
     CCLOG("[Agora]:onApiCallExecuted : %d, %s, %s", err, api, result);
     
     std::string apiMsg = api;
@@ -810,7 +810,7 @@ void CAgoraAudioJsWrapper::onApiCallExecuted(int err, const char* api, const cha
     });
 }
 
-void CAgoraAudioJsWrapper::onConnectionLost() {
+void CagoraCreatorJsWrapper::onConnectionLost() {
     CCLOG("[Agora]:onConnectionLost ");
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -825,7 +825,7 @@ void CAgoraAudioJsWrapper::onConnectionLost() {
 }
 
 
-void CAgoraAudioJsWrapper::onConnectionInterrupted() {
+void CagoraCreatorJsWrapper::onConnectionInterrupted() {
     CCLOG("[Agora]:onConnectionInterrupted ");
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -840,7 +840,7 @@ void CAgoraAudioJsWrapper::onConnectionInterrupted() {
 }
 
 
-void CAgoraAudioJsWrapper::onConnectionBanned() {
+void CagoraCreatorJsWrapper::onConnectionBanned() {
     CCLOG("[Agora]:onConnectionBanned ");
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -854,18 +854,18 @@ void CAgoraAudioJsWrapper::onConnectionBanned() {
     });
 }
 
-void CAgoraAudioJsWrapper::onRefreshRecordingServiceStatus(int status) {
+void CagoraCreatorJsWrapper::onRefreshRecordingServiceStatus(int status) {
     (void)status;
 }
 
-void CAgoraAudioJsWrapper::onStreamMessage(uid_t userId, int streamId, const char* data, size_t length) {
+void CagoraCreatorJsWrapper::onStreamMessage(uid_t userId, int streamId, const char* data, size_t length) {
     (void)userId;
     (void)streamId;
     (void)data;
     (void)length;
 }
 
-void CAgoraAudioJsWrapper::onStreamMessageError(uid_t userId, int streamId, int code, int missed, int cached) {
+void CagoraCreatorJsWrapper::onStreamMessageError(uid_t userId, int streamId, int code, int missed, int cached) {
     (void)userId;
     (void)streamId;
     (void)code;
@@ -873,8 +873,8 @@ void CAgoraAudioJsWrapper::onStreamMessageError(uid_t userId, int streamId, int 
     (void)cached;
 }
 
-void CAgoraAudioJsWrapper::onMediaEngineLoadSuccess() {}
-void CAgoraAudioJsWrapper::onMediaEngineStartCallSuccess() {
+void CagoraCreatorJsWrapper::onMediaEngineLoadSuccess() {}
+void CagoraCreatorJsWrapper::onMediaEngineStartCallSuccess() {
 }
 /**
 * when token is enabled, and specified token is invalid or expired, this function will be called.
@@ -882,7 +882,7 @@ void CAgoraAudioJsWrapper::onMediaEngineStartCallSuccess() {
 * NOTE: to be compatible with previous version, ERR_TOKEN_EXPIRED and ERR_INVALID_TOKEN are also reported via onError() callback.
 * You should move renew of token logic into this callback.
 */
-void CAgoraAudioJsWrapper::onRequestToken() {
+void CagoraCreatorJsWrapper::onRequestToken() {
     CCLOG("[Agora]:onRequestToken ");
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -897,7 +897,7 @@ void CAgoraAudioJsWrapper::onRequestToken() {
 }
 
 
-void CAgoraAudioJsWrapper::onFirstLocalAudioFrame(int elapsed) {
+void CagoraCreatorJsWrapper::onFirstLocalAudioFrame(int elapsed) {
 
     CCLOG("[Agora]:onFirstLocalAudioFrame : %d", elapsed);
 
@@ -917,7 +917,7 @@ void CAgoraAudioJsWrapper::onFirstLocalAudioFrame(int elapsed) {
 }
 
 
-void CAgoraAudioJsWrapper::onFirstRemoteAudioFrame(uid_t userId, int elapsed) {
+void CagoraCreatorJsWrapper::onFirstRemoteAudioFrame(uid_t userId, int elapsed) {
     
     CCLOG("[Agora]:onFirstRemoteAudioFrame : %u, %d", userId, elapsed);
     
@@ -936,7 +936,7 @@ void CAgoraAudioJsWrapper::onFirstRemoteAudioFrame(uid_t userId, int elapsed) {
     });
 }
 
-void CAgoraAudioJsWrapper::onActiveSpeaker(uid_t userId) {
+void CagoraCreatorJsWrapper::onActiveSpeaker(uid_t userId) {
     CCLOG("[Agora]:onActiveSpeaker : %u", userId);
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -953,8 +953,7 @@ void CAgoraAudioJsWrapper::onActiveSpeaker(uid_t userId) {
     });
 }
 
-
-void CAgoraAudioJsWrapper::onClientRoleChanged(CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole) {
+void CagoraCreatorJsWrapper::onClientRoleChanged(CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole) {
     CCLOG("[Agora]:onClientRoleChanged : %d, %d", oldRole, newRole);
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -971,8 +970,8 @@ void CAgoraAudioJsWrapper::onClientRoleChanged(CLIENT_ROLE_TYPE oldRole, CLIENT_
         }
     });
 }
-
-void CAgoraAudioJsWrapper::onAudioDeviceVolumeChanged(MEDIA_DEVICE_TYPE deviceType, int volume, bool muted) {
+// Only in Windows or Mac
+void CagoraCreatorJsWrapper::onAudioDeviceVolumeChanged(MEDIA_DEVICE_TYPE deviceType, int volume, bool muted) {
     CCLOG("[Agora]:onAudioDeviceVolumeChanged : %d, %d", deviceType, volume);
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -991,24 +990,24 @@ void CAgoraAudioJsWrapper::onAudioDeviceVolumeChanged(MEDIA_DEVICE_TYPE deviceTy
     });
 }
 
-void CAgoraAudioJsWrapper::onStreamPublished(const char *url, int error) {
+void CagoraCreatorJsWrapper::onStreamPublished(const char *url, int error) {
     (void)url;
     (void)error;
 }
 
-void CAgoraAudioJsWrapper::onStreamUnpublished(const char *url) {
+void CagoraCreatorJsWrapper::onStreamUnpublished(const char *url) {
     (void)url;
 }
 
-void CAgoraAudioJsWrapper::onTranscodingUpdated() {}
+void CagoraCreatorJsWrapper::onTranscodingUpdated() {}
 
-void CAgoraAudioJsWrapper::onStreamInjectedStatus(const char* url, uid_t userId, int status) {
+void CagoraCreatorJsWrapper::onStreamInjectedStatus(const char* url, uid_t userId, int status) {
     (void)url;
     (void)userId;
     (void)status;
 }
 
-void CAgoraAudioJsWrapper::onAudioRoutingChanged(int routing) {
+void CagoraCreatorJsWrapper::onAudioRoutingChanged(int routing) {
     CCLOG("[Agora]:onAudioRoutingChanged : %d", routing);
     
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -1025,7 +1024,7 @@ void CAgoraAudioJsWrapper::onAudioRoutingChanged(int routing) {
     });
 }
 
-void CAgoraAudioJsWrapper::onRemoteAudioTransportStats(
+void CagoraCreatorJsWrapper::onRemoteAudioTransportStats(
     uid_t uid, unsigned short delay, unsigned short lost,
     unsigned short rxKBitRate) {
         (void)uid;
@@ -1034,7 +1033,7 @@ void CAgoraAudioJsWrapper::onRemoteAudioTransportStats(
         (void)rxKBitRate;
 }
 
-void CAgoraAudioJsWrapper::onMicrophoneEnabled(bool enabled) {
+void CagoraCreatorJsWrapper::onMicrophoneEnabled(bool enabled) {
     CCLOG("[Agora]:onMicrophoneEnabled,enabled : %d",  enabled);
         
     Application::getInstance()->getScheduler()->performFunctionInCocosThread([=](){
@@ -1052,18 +1051,18 @@ void CAgoraAudioJsWrapper::onMicrophoneEnabled(bool enabled) {
 
 #define AGORA_CHECK(error) { int code = error; if (code != 0) CCLOG("[Agora Error] %s", agora()->getErrorDescription(code)); }
 
-static bool js_cocos2dx_extension_agoraAudio_initialize(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_initialize(se::State& s)
 {
-    CCLOG("[Agora] js_cocos2dx_extension_agoraAudio_initialize");
+    CCLOG("[Agora] js_cocos2dx_extension_agoraCreator_initialize");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_initialize : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_initialize : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
     if (argc == 1) {
         std::string appId;
         ok &= seval_to_std_string(args[0], &appId);
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_initialize : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_initialize : Error processing arguments");
 
         RtcEngineContext ctx;
         ctx.appId = appId.c_str();
@@ -1071,19 +1070,19 @@ static bool js_cocos2dx_extension_agoraAudio_initialize(se::State& s)
         int ret = cobj->initialize(ctx);
 
         ok &= int32_to_seval(ret, &s.rval());
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_initialize : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_initialize : Error processing arguments");
         return true;
     }
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_initialize)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_initialize)
 
-static bool js_cocos2dx_extension_agoraAudio_joinChannel(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_joinChannel(se::State& s)
 {
-    CCLOG("[Agora] js_cocos2dx_extension_agoraAudio_joinChannel");
+    CCLOG("[Agora] js_cocos2dx_extension_agoraCreator_joinChannel");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_joinChannel : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_joinChannel : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1108,33 +1107,33 @@ static bool js_cocos2dx_extension_agoraAudio_joinChannel(se::State& s)
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 4);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_joinChannel)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_joinChannel)
 
-static bool js_cocos2dx_extension_agoraAudio_leaveChannel(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_leaveChannel(se::State& s)
 {
     CCLOG("leaveChannel() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_leaveChannel: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_leaveChannel: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
     if (argc == 0) {
         int ret = cobj->leaveChannel();
         ok &= int32_to_seval(ret, &s.rval());
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_leaveChannel : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_leaveChannel : Error processing arguments");
         return true;
     }
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_leaveChannel)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_leaveChannel)
 
 
-static bool js_cocos2dx_extension_agoraAudio_getVersion(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_getVersion(se::State& s) {
     CCLOG("getVersion()  !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    // CAgoraAudioJsWrapper* cobj = (CAgoraAudioJsWrapper*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_getVersion: Invalid Native Object");
+    // CagoraCreatorJsWrapper* cobj = (CagoraCreatorJsWrapper*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_getVersion: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1145,19 +1144,19 @@ static bool js_cocos2dx_extension_agoraAudio_getVersion(se::State& s) {
         
         ok &= std_string_to_seval(strTemp,&s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_getVersion : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_getVersion : Error processing arguments");
         return true;
     }
     
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_getVersion)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_getVersion)
 
-static bool js_cocos2dx_extension_agoraAudio_getErrorDescription(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_getErrorDescription(se::State& s) {
     CCLOG("getErrorDescription() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_getVersion: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_getVersion: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1170,19 +1169,19 @@ static bool js_cocos2dx_extension_agoraAudio_getErrorDescription(se::State& s) {
         std::string strTemp(description);
         
         ok &= std_string_to_seval(strTemp,&s.rval());
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_getErrorDescription : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_getErrorDescription : Error processing arguments");
         return true;
     }
     
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_getErrorDescription)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_getErrorDescription)
 
-static bool js_cocos2dx_extension_agoraAudio_setLogFilter(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_setLogFilter(se::State& s) {
     CCLOG("setLogFilter() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setLogFilter: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setLogFilter: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1195,7 +1194,7 @@ static bool js_cocos2dx_extension_agoraAudio_setLogFilter(se::State& s) {
         
         int32_to_seval(ret, &s.rval());
    
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_getErrorDescription : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_getErrorDescription : Error processing arguments");
         return true;
     }
     
@@ -1203,12 +1202,12 @@ static bool js_cocos2dx_extension_agoraAudio_setLogFilter(se::State& s) {
     return false;
     
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setLogFilter)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setLogFilter)
 
-static bool js_cocos2dx_extension_agoraAudio_setLogFile(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_setLogFile(se::State& s) {
     CCLOG("setLogFilter() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setLogFilter: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setLogFilter: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1221,7 +1220,7 @@ static bool js_cocos2dx_extension_agoraAudio_setLogFile(se::State& s) {
         
         int32_to_seval(ret, &s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_getErrorDescription : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_getErrorDescription : Error processing arguments");
         return true;
     }
     
@@ -1229,13 +1228,13 @@ static bool js_cocos2dx_extension_agoraAudio_setLogFile(se::State& s) {
     return false;
     
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setLogFile)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setLogFile)
 
-static bool js_cocos2dx_extension_agoraAudio_renewToken(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_renewToken(se::State& s)
 {
-    CCLOG("[Agora] js_cocos2dx_extension_agoraAudio_renewToken");
+    CCLOG("[Agora] js_cocos2dx_extension_agoraCreator_renewToken");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_renewToken : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_renewToken : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1251,12 +1250,12 @@ static bool js_cocos2dx_extension_agoraAudio_renewToken(se::State& s)
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_renewToken)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_renewToken)
 
-static bool js_cocos2dx_extension_agoraAudio_setChannelProfile(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_setChannelProfile(se::State& s) {
     CCLOG("setChannelProfile() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setChannelProfile: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setChannelProfile: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1269,7 +1268,7 @@ static bool js_cocos2dx_extension_agoraAudio_setChannelProfile(se::State& s) {
         
         int32_to_seval(ret, &s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_setChannelProfile : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_setChannelProfile : Error processing arguments");
         return true;
     }
     
@@ -1277,13 +1276,13 @@ static bool js_cocos2dx_extension_agoraAudio_setChannelProfile(se::State& s) {
     return false;
     
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setChannelProfile)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setChannelProfile)
 
 
-static bool js_cocos2dx_extension_agoraAudio_setClientRole(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_setClientRole(se::State& s) {
     CCLOG("setClientRole() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setChannelProfile: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setChannelProfile: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1296,7 +1295,7 @@ static bool js_cocos2dx_extension_agoraAudio_setClientRole(se::State& s) {
         
         int32_to_seval(ret, &s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_setClientRole : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_setClientRole : Error processing arguments");
         return true;
     }
     
@@ -1304,12 +1303,12 @@ static bool js_cocos2dx_extension_agoraAudio_setClientRole(se::State& s) {
     return false;
     
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setClientRole)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setClientRole)
 
-static bool js_cocos2dx_extension_agoraAudio_enableLocalAudio(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_enableLocalAudio(se::State& s) {
     CCLOG("enableLocalAudio() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_enableLocalAudio: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_enableLocalAudio: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1321,19 +1320,19 @@ static bool js_cocos2dx_extension_agoraAudio_enableLocalAudio(se::State& s) {
         int  ret = cobj->enableLocalAudio(bVal);
         int32_to_seval(ret, &s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_enableLocalAudio : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_enableLocalAudio : Error processing arguments");
         return true;
     }
     
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_enableLocalAudio)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_enableLocalAudio)
 
-static bool js_cocos2dx_extension_agoraAudio_setAudioProfile(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_setAudioProfile(se::State& s) {
     CCLOG("setAudioProfile() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setAudioProfile: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setAudioProfile: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1349,7 +1348,7 @@ static bool js_cocos2dx_extension_agoraAudio_setAudioProfile(se::State& s) {
         
         int32_to_seval(ret, &s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_setAudioProfile : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_setAudioProfile : Error processing arguments");
         return true;
     }
     
@@ -1357,13 +1356,13 @@ static bool js_cocos2dx_extension_agoraAudio_setAudioProfile(se::State& s) {
     return false;
     
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setAudioProfile)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setAudioProfile)
 
 
-static bool js_cocos2dx_extension_agoraAudio_setDefaultMuteAllRemoteAudioStreams(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_setDefaultMuteAllRemoteAudioStreams(se::State& s) {
     CCLOG("setDefaultMuteAllRemoteAudioStreams() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setDefaultMuteAllRemoteAudioStreams: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setDefaultMuteAllRemoteAudioStreams: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1375,19 +1374,19 @@ static bool js_cocos2dx_extension_agoraAudio_setDefaultMuteAllRemoteAudioStreams
         int  ret = cobj->setDefaultMuteAllRemoteAudioStreams(bVal);
         int32_to_seval(ret, &s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_setDefaultMuteAllRemoteAudioStreams : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_setDefaultMuteAllRemoteAudioStreams : Error processing arguments");
         return true;
     }
     
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setDefaultMuteAllRemoteAudioStreams)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setDefaultMuteAllRemoteAudioStreams)
 
-static bool js_cocos2dx_extension_agoraAudio_setPlaybackDeviceVolume(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_setPlaybackDeviceVolume(se::State& s) {
     CCLOG("setPlaybackDeviceVolume() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setPlaybackDeviceVolume: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setPlaybackDeviceVolume: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1400,7 +1399,7 @@ static bool js_cocos2dx_extension_agoraAudio_setPlaybackDeviceVolume(se::State& 
         
         int32_to_seval(ret, &s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_setPlaybackDeviceVolume : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_setPlaybackDeviceVolume : Error processing arguments");
         return true;
     }
     
@@ -1408,12 +1407,12 @@ static bool js_cocos2dx_extension_agoraAudio_setPlaybackDeviceVolume(se::State& 
     return false;
     
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setPlaybackDeviceVolume)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setPlaybackDeviceVolume)
 
-static bool js_cocos2dx_extension_agoraAudio_enableAudioVolumeIndication(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_enableAudioVolumeIndication(se::State& s) {
     CCLOG("enableAudioVolumeIndication() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_enableAudioVolumeIndication: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_enableAudioVolumeIndication: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1429,7 +1428,7 @@ static bool js_cocos2dx_extension_agoraAudio_enableAudioVolumeIndication(se::Sta
         
         int32_to_seval(ret, &s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_enableAudioVolumeIndication : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_enableAudioVolumeIndication : Error processing arguments");
         return true;
     }
     
@@ -1437,13 +1436,13 @@ static bool js_cocos2dx_extension_agoraAudio_enableAudioVolumeIndication(se::Sta
     return false;
     
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_enableAudioVolumeIndication)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_enableAudioVolumeIndication)
 
-static bool js_cocos2dx_extension_agoraAudio_startAudioRecording(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_startAudioRecording(se::State& s)
 {
     CCLOG("[Agora] startAudioRecording() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_startAudioRecording : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_startAudioRecording : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1462,32 +1461,32 @@ static bool js_cocos2dx_extension_agoraAudio_startAudioRecording(se::State& s)
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_startAudioRecording)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_startAudioRecording)
 
-static bool js_cocos2dx_extension_agoraAudio_stopAudioRecording(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_stopAudioRecording(se::State& s)
 {
     CCLOG("stopAudioRecording() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_stopAudioRecording: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_stopAudioRecording: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
     if (argc == 0) {
         int ret = cobj->stopAudioRecording();
         ok &= int32_to_seval(ret, &s.rval());
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_stopAudioRecording : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_stopAudioRecording : Error processing arguments");
         return true;
     }
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_stopAudioRecording)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_stopAudioRecording)
 
-static bool js_cocos2dx_extension_agoraAudio_startAudioMixing(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_startAudioMixing(se::State& s)
 {
     CCLOG("[Agora] startAudioMixing() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_startAudioMixing : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_startAudioMixing : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1512,70 +1511,70 @@ static bool js_cocos2dx_extension_agoraAudio_startAudioMixing(se::State& s)
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 4);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_startAudioMixing)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_startAudioMixing)
 
-static bool js_cocos2dx_extension_agoraAudio_stopAudioMixing(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_stopAudioMixing(se::State& s)
 {
     CCLOG("stopAudioMixing() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_stopAudioMixing: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_stopAudioMixing: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
     if (argc == 0) {
         int ret = cobj->stopAudioMixing();
         ok &= int32_to_seval(ret, &s.rval());
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_stopAudioMixing : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_stopAudioMixing : Error processing arguments");
         return true;
     }
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_stopAudioMixing)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_stopAudioMixing)
 
-static bool js_cocos2dx_extension_agoraAudio_pauseAudioMixing(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_pauseAudioMixing(se::State& s)
 {
     CCLOG("pauseAudioMixing() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_pauseAudioMixing: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_pauseAudioMixing: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
     if (argc == 0) {
         int ret = cobj->pauseAudioMixing();
         ok &= int32_to_seval(ret, &s.rval());
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_pauseAudioMixing : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_pauseAudioMixing : Error processing arguments");
         return true;
     }
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_pauseAudioMixing)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_pauseAudioMixing)
 
-static bool js_cocos2dx_extension_agoraAudio_resumeAudioMixing(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_resumeAudioMixing(se::State& s)
 {
     CCLOG("resumeAudioMixing() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_resumeAudioMixing: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_resumeAudioMixing: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
     if (argc == 0) {
         int ret = cobj->resumeAudioMixing();
         ok &= int32_to_seval(ret, &s.rval());
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_resumeAudioMixing : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_resumeAudioMixing : Error processing arguments");
         return true;
     }
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_resumeAudioMixing)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_resumeAudioMixing)
 
-static bool js_cocos2dx_extension_agoraAudio_adjustAudioMixingVolume(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_adjustAudioMixingVolume(se::State& s)
 {
     CCLOG("[Agora] adjustAudioMixingVolume() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_adjustAudioMixingVolume : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_adjustAudioMixingVolume : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1591,51 +1590,51 @@ static bool js_cocos2dx_extension_agoraAudio_adjustAudioMixingVolume(se::State& 
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_adjustAudioMixingVolume)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_adjustAudioMixingVolume)
 
-static bool js_cocos2dx_extension_agoraAudio_getAudioMixingDuration(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_getAudioMixingDuration(se::State& s)
 {
     CCLOG("getAudioMixingDuration() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_getAudioMixingDuration: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_getAudioMixingDuration: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
     if (argc == 0) {
         int ret = cobj->getAudioMixingDuration();
         ok &= int32_to_seval(ret, &s.rval());
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_getAudioMixingDuration : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_getAudioMixingDuration : Error processing arguments");
         return true;
     }
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_getAudioMixingDuration)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_getAudioMixingDuration)
 
-static bool js_cocos2dx_extension_agoraAudio_getAudioMixingCurrentPosition(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_getAudioMixingCurrentPosition(se::State& s)
 {
     CCLOG("getAudioMixingCurrentPosition() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_getAudioMixingCurrentPosition: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_getAudioMixingCurrentPosition: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
     if (argc == 0) {
         int ret = cobj->getAudioMixingCurrentPosition();
         ok &= int32_to_seval(ret, &s.rval());
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_getAudioMixingCurrentPosition : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_getAudioMixingCurrentPosition : Error processing arguments");
         return true;
     }
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_getAudioMixingCurrentPosition)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_getAudioMixingCurrentPosition)
 
-static bool js_cocos2dx_extension_agoraAudio_setAudioMixingPosition(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_setAudioMixingPosition(se::State& s)
 {
     CCLOG("[Agora] setAudioMixingPosition() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setAudioMixingPosition : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setAudioMixingPosition : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1651,13 +1650,13 @@ static bool js_cocos2dx_extension_agoraAudio_setAudioMixingPosition(se::State& s
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setAudioMixingPosition)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setAudioMixingPosition)
 
-static bool js_cocos2dx_extension_agoraAudio_getEffectsVolume(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_getEffectsVolume(se::State& s)
 {
     CCLOG("[Agora] getEffectsVolume() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_getEffectsVolume : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_getEffectsVolume : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1670,13 +1669,13 @@ static bool js_cocos2dx_extension_agoraAudio_getEffectsVolume(se::State& s)
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_getEffectsVolume)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_getEffectsVolume)
 
-static bool js_cocos2dx_extension_agoraAudio_setEffectsVolume(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_setEffectsVolume(se::State& s)
 {
     CCLOG("[Agora] setEffectsVolume() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setEffectsVolume : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setEffectsVolume : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1692,13 +1691,13 @@ static bool js_cocos2dx_extension_agoraAudio_setEffectsVolume(se::State& s)
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setEffectsVolume)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setEffectsVolume)
 
-static bool js_cocos2dx_extension_agoraAudio_setVolumeOfEffect(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_setVolumeOfEffect(se::State& s)
 {
     CCLOG("[Agora] setVolumeOfEffect() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setVolumeOfEffect : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setVolumeOfEffect : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1717,14 +1716,14 @@ static bool js_cocos2dx_extension_agoraAudio_setVolumeOfEffect(se::State& s)
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setVolumeOfEffect)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setVolumeOfEffect)
 
 
-static bool js_cocos2dx_extension_agoraAudio_playEffect(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_playEffect(se::State& s)
 {
     CCLOG("[Agora] playEffect() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_playEffect : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_playEffect : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1785,14 +1784,14 @@ static bool js_cocos2dx_extension_agoraAudio_playEffect(se::State& s)
     
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_playEffect)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_playEffect)
 
 
-static bool js_cocos2dx_extension_agoraAudio_stopEffect(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_stopEffect(se::State& s)
 {
     CCLOG("[Agora] stopEffect() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_stopEffect : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_stopEffect : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1808,14 +1807,14 @@ static bool js_cocos2dx_extension_agoraAudio_stopEffect(se::State& s)
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_stopEffect)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_stopEffect)
 
 
-static bool js_cocos2dx_extension_agoraAudio_stopAllEffects(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_stopAllEffects(se::State& s)
 {
     CCLOG("[Agora] stopAllEffects() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_stopAllEffects : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_stopAllEffects : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1828,14 +1827,14 @@ static bool js_cocos2dx_extension_agoraAudio_stopAllEffects(se::State& s)
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_stopAllEffects)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_stopAllEffects)
 
 
-static bool js_cocos2dx_extension_agoraAudio_preloadEffect(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_preloadEffect(se::State& s)
 {
     CCLOG("[Agora] preloadEffect() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_preloadEffect : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_preloadEffect : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1854,13 +1853,13 @@ static bool js_cocos2dx_extension_agoraAudio_preloadEffect(se::State& s)
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_preloadEffect)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_preloadEffect)
 
-static bool js_cocos2dx_extension_agoraAudio_unloadEffect(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_unloadEffect(se::State& s)
 {
     CCLOG("[Agora] unloadEffect() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_unloadEffect : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_unloadEffect : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1876,13 +1875,13 @@ static bool js_cocos2dx_extension_agoraAudio_unloadEffect(se::State& s)
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_unloadEffect)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_unloadEffect)
 
-static bool js_cocos2dx_extension_agoraAudio_pauseEffect(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_pauseEffect(se::State& s)
 {
     CCLOG("[Agora] pauseEffect() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_pauseEffect : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_pauseEffect : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1898,33 +1897,33 @@ static bool js_cocos2dx_extension_agoraAudio_pauseEffect(se::State& s)
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_pauseEffect)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_pauseEffect)
 
-static bool js_cocos2dx_extension_agoraAudio_pauseAllEffects(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_pauseAllEffects(se::State& s)
 {
     CCLOG("[Agora] pauseAllEffects() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_pauseAllEffects : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_pauseAllEffects : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
     if (argc == 0) {
         int ret = cobj->pauseAllEffects();
         ok &= int32_to_seval(ret, &s.rval());
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_pauseAllEffects : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_pauseAllEffects : Error processing arguments");
         return true;
     }
     
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_pauseAllEffects)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_pauseAllEffects)
 
-static bool js_cocos2dx_extension_agoraAudio_resumeEffect(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_resumeEffect(se::State& s)
 {
     CCLOG("[Agora] resumeEffect() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_resumeEffect : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_resumeEffect : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1935,19 +1934,19 @@ static bool js_cocos2dx_extension_agoraAudio_resumeEffect(se::State& s)
         int ret = cobj->resumeEffect(soundId);
         
         int32_to_seval(ret, &s.rval());
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_resumeEffect : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_resumeEffect : Error processing arguments");
         return true;
     }
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_resumeEffect)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_resumeEffect)
 
-static bool js_cocos2dx_extension_agoraAudio_resumeAllEffects(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_resumeAllEffects(se::State& s)
 {
     CCLOG("[Agora] resumeAllEffects() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_resumeAllEffects : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_resumeAllEffects : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1955,19 +1954,19 @@ static bool js_cocos2dx_extension_agoraAudio_resumeAllEffects(se::State& s)
         int ret = cobj->resumeAllEffects();
         
         int32_to_seval(ret, &s.rval());
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_resumeAllEffects : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_resumeAllEffects : Error processing arguments");
         return true;
     }
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_resumeAllEffects)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_resumeAllEffects)
 
-static bool js_cocos2dx_extension_agoraAudio_setLocalVoicePitch(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_setLocalVoicePitch(se::State& s)
 {
     CCLOG("[Agora] setLocalVoicePitch() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setLocalVoicePitch : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setLocalVoicePitch : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -1978,19 +1977,19 @@ static bool js_cocos2dx_extension_agoraAudio_setLocalVoicePitch(se::State& s)
         int ret = cobj->setLocalVoicePitch(pitch);
         
         int32_to_seval(ret, &s.rval());
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_setLocalVoicePitch : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_setLocalVoicePitch : Error processing arguments");
         return true;
     }
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setLocalVoicePitch)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setLocalVoicePitch)
 
-static bool js_cocos2dx_extension_agoraAudio_setRemoteVoicePosition(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_setRemoteVoicePosition(se::State& s)
 {
     CCLOG("[Agora] setRemoteVoicePosition() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setRemoteVoicePosition : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setRemoteVoicePosition : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2007,18 +2006,18 @@ static bool js_cocos2dx_extension_agoraAudio_setRemoteVoicePosition(se::State& s
         int ret = cobj->setRemoteVoicePosition(uid, pan, gain);
         
         int32_to_seval(ret, &s.rval());
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_setRemoteVoicePosition : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_setRemoteVoicePosition : Error processing arguments");
         return true;
     }
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 3);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setRemoteVoicePosition)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setRemoteVoicePosition)
 
-static bool js_cocos2dx_extension_agoraAudio_setVoiceOnlyMode(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_setVoiceOnlyMode(se::State& s) {
     CCLOG("setVoiceOnlyMode() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setVoiceOnlyMode: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setVoiceOnlyMode: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2029,7 +2028,7 @@ static bool js_cocos2dx_extension_agoraAudio_setVoiceOnlyMode(se::State& s) {
         int  ret = cobj->setVoiceOnlyMode(enable);
         int32_to_seval(ret, &s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_setVoiceOnlyMode : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_setVoiceOnlyMode : Error processing arguments");
         return true;
     }
     
@@ -2037,14 +2036,14 @@ static bool js_cocos2dx_extension_agoraAudio_setVoiceOnlyMode(se::State& s) {
     return false;
     
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setVoiceOnlyMode)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setVoiceOnlyMode)
 
 
-static bool js_cocos2dx_extension_agoraAudio_setLocalVoiceEqualization(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_setLocalVoiceEqualization(se::State& s)
 {
     CCLOG("[Agora] setLocalVoiceEqualization() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setLocalVoiceEqualization : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setLocalVoiceEqualization : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2063,13 +2062,13 @@ static bool js_cocos2dx_extension_agoraAudio_setLocalVoiceEqualization(se::State
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setLocalVoiceEqualization)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setLocalVoiceEqualization)
 
-static bool js_cocos2dx_extension_agoraAudio_setLocalVoiceReverb(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_setLocalVoiceReverb(se::State& s)
 {
     CCLOG("[Agora] setLocalVoiceReverb() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setLocalVoiceReverb : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setLocalVoiceReverb : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2088,13 +2087,13 @@ static bool js_cocos2dx_extension_agoraAudio_setLocalVoiceReverb(se::State& s)
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setLocalVoiceReverb)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setLocalVoiceReverb)
 
-static bool js_cocos2dx_extension_agoraAudio_pauseAudio(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_pauseAudio(se::State& s)
 {
     CCLOG("[Agora] pauseAudio() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_pauseAudio : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_pauseAudio : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2102,19 +2101,19 @@ static bool js_cocos2dx_extension_agoraAudio_pauseAudio(se::State& s)
         int ret = cobj->pauseAudio();
         
         int32_to_seval(ret, &s.rval());
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_pauseAudio : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_pauseAudio : Error processing arguments");
         return true;
     }
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_pauseAudio)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_pauseAudio)
 
-static bool js_cocos2dx_extension_agoraAudio_resumeAudio(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_resumeAudio(se::State& s)
 {
     CCLOG("[Agora] resumeAudio() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_resumeAudio : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_resumeAudio : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2122,19 +2121,19 @@ static bool js_cocos2dx_extension_agoraAudio_resumeAudio(se::State& s)
         int ret = cobj->resumeAudio();
         
         int32_to_seval(ret, &s.rval());
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_resumeAudio : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_resumeAudio : Error processing arguments");
         return true;
     }
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_resumeAudio)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_resumeAudio)
 
-static bool js_cocos2dx_extension_agoraAudio_adjustRecordingSignalVolume(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_adjustRecordingSignalVolume(se::State& s)
 {
     CCLOG("[Agora] adjustRecordingSignalVolume() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_adjustRecordingSignalVolume : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_adjustRecordingSignalVolume : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2150,13 +2149,13 @@ static bool js_cocos2dx_extension_agoraAudio_adjustRecordingSignalVolume(se::Sta
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_adjustRecordingSignalVolume)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_adjustRecordingSignalVolume)
 
-static bool js_cocos2dx_extension_agoraAudio_adjustPlaybackSignalVolume(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_adjustPlaybackSignalVolume(se::State& s)
 {
     CCLOG("[Agora] adjustPlaybackSignalVolume() ");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_adjustPlaybackSignalVolume : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_adjustPlaybackSignalVolume : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2172,12 +2171,12 @@ static bool js_cocos2dx_extension_agoraAudio_adjustPlaybackSignalVolume(se::Stat
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_adjustPlaybackSignalVolume)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_adjustPlaybackSignalVolume)
 
-static bool js_cocos2dx_extension_agoraAudio_setHighQualityAudioParameters(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_setHighQualityAudioParameters(se::State& s) {
     CCLOG("setHighQualityAudioParameters() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setHighQualityAudioParameters: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setHighQualityAudioParameters: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2195,7 +2194,7 @@ static bool js_cocos2dx_extension_agoraAudio_setHighQualityAudioParameters(se::S
         int  ret = cobj->setHighQualityAudioParameters(fullband, stereo, fullBitrate);
         int32_to_seval(ret, &s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_setHighQualityAudioParameters : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_setHighQualityAudioParameters : Error processing arguments");
         return true;
     }
     
@@ -2203,12 +2202,12 @@ static bool js_cocos2dx_extension_agoraAudio_setHighQualityAudioParameters(se::S
     return false;
     
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setHighQualityAudioParameters)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setHighQualityAudioParameters)
 
-static bool js_cocos2dx_extension_agoraAudio_enableWebSdkInteroperability(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_enableWebSdkInteroperability(se::State& s) {
     CCLOG("enableWebSdkInteroperability() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_enableWebSdkInteroperability: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_enableWebSdkInteroperability: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2220,7 +2219,7 @@ static bool js_cocos2dx_extension_agoraAudio_enableWebSdkInteroperability(se::St
         int  ret = cobj->enableWebSdkInteroperability(enabled);
         int32_to_seval(ret, &s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_enableWebSdkInteroperability : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_enableWebSdkInteroperability : Error processing arguments");
         return true;
     }
     
@@ -2228,12 +2227,12 @@ static bool js_cocos2dx_extension_agoraAudio_enableWebSdkInteroperability(se::St
     return false;
     
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_enableWebSdkInteroperability)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_enableWebSdkInteroperability)
 
-static bool js_cocos2dx_extension_agoraAudio_setInEarMonitoringVolume(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_setInEarMonitoringVolume(se::State& s) {
     CCLOG("setInEarMonitoringVolume() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setInEarMonitoringVolume: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setInEarMonitoringVolume: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2245,7 +2244,7 @@ static bool js_cocos2dx_extension_agoraAudio_setInEarMonitoringVolume(se::State&
         int  ret = cobj->setInEarMonitoringVolume(volume);
         int32_to_seval(ret, &s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_setInEarMonitoringVolume : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_setInEarMonitoringVolume : Error processing arguments");
         return true;
     }
     
@@ -2253,12 +2252,12 @@ static bool js_cocos2dx_extension_agoraAudio_setInEarMonitoringVolume(se::State&
     return false;
     
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setInEarMonitoringVolume)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setInEarMonitoringVolume)
 
-static bool js_cocos2dx_extension_agoraAudio_isSpeakerphoneEnabled(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_isSpeakerphoneEnabled(se::State& s) {
     CCLOG("isSpeakerphoneEnabled() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_isSpeakerphoneEnabled: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_isSpeakerphoneEnabled: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2267,7 +2266,7 @@ static bool js_cocos2dx_extension_agoraAudio_isSpeakerphoneEnabled(se::State& s)
         bool ret = cobj->isSpeakerphoneEnabled();
         boolean_to_seval(ret, &s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_isSpeakerphoneEnabled : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_isSpeakerphoneEnabled : Error processing arguments");
         return true;
     }
     
@@ -2275,13 +2274,13 @@ static bool js_cocos2dx_extension_agoraAudio_isSpeakerphoneEnabled(se::State& s)
     return false;
     
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_isSpeakerphoneEnabled)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_isSpeakerphoneEnabled)
 
-static bool js_cocos2dx_extension_agoraAudio_setEncryptionMode(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_setEncryptionMode(se::State& s)
 {
     CCLOG("[Agora] setEncryptionMode");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setEncryptionMode : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setEncryptionMode : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2290,19 +2289,19 @@ static bool js_cocos2dx_extension_agoraAudio_setEncryptionMode(se::State& s)
         ok &= seval_to_std_string(args[0], &encryptionMode);
         int ret = cobj->setEncryptionMode(encryptionMode.c_str());
         int32_to_seval(ret, &s.rval());
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_setEncryptionMode : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_setEncryptionMode : Error processing arguments");
         return true;
     }
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setEncryptionMode)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setEncryptionMode)
 
-static bool js_cocos2dx_extension_agoraAudio_setEncryptionSecret(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_setEncryptionSecret(se::State& s)
 {
     CCLOG("[Agora] setEncryptionSecret");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setEncryptionSecret : Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setEncryptionSecret : Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2311,18 +2310,18 @@ static bool js_cocos2dx_extension_agoraAudio_setEncryptionSecret(se::State& s)
         ok &= seval_to_std_string(args[0], &secret);
         int ret = cobj->setEncryptionSecret(secret.c_str());
         int32_to_seval(ret, &s.rval());
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_setEncryptionSecret : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_setEncryptionSecret : Error processing arguments");
         return true;
     }
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setEncryptionSecret)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setEncryptionSecret)
 
-static bool js_cocos2dx_extension_agoraAudio_enableAudio(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_enableAudio(se::State& s) {
     CCLOG("enableAudio() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_enableAudio: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_enableAudio: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2331,7 +2330,7 @@ static bool js_cocos2dx_extension_agoraAudio_enableAudio(se::State& s) {
         int  ret = cobj->enableAudio();
         int32_to_seval(ret, &s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_enableAudio : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_enableAudio : Error processing arguments");
         return true;
     }
     
@@ -2339,12 +2338,12 @@ static bool js_cocos2dx_extension_agoraAudio_enableAudio(se::State& s) {
     return false;
     
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_enableAudio)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_enableAudio)
 
-static bool js_cocos2dx_extension_agoraAudio_disableAudio(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_disableAudio(se::State& s) {
     CCLOG("disableAudio() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_disableAudio: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_disableAudio: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2353,7 +2352,7 @@ static bool js_cocos2dx_extension_agoraAudio_disableAudio(se::State& s) {
         int  ret = cobj->disableAudio();
         int32_to_seval(ret, &s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_disableAudio : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_disableAudio : Error processing arguments");
         return true;
     }
     
@@ -2361,12 +2360,12 @@ static bool js_cocos2dx_extension_agoraAudio_disableAudio(se::State& s) {
     return false;
     
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_disableAudio)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_disableAudio)
 
-static bool js_cocos2dx_extension_agoraAudio_muteLocalAudioStream(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_muteLocalAudioStream(se::State& s) {
     CCLOG("muteLocalAudioStream() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_muteLocalAudioStream: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_muteLocalAudioStream: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2378,7 +2377,7 @@ static bool js_cocos2dx_extension_agoraAudio_muteLocalAudioStream(se::State& s) 
         int  ret = cobj->muteLocalAudioStream(bVal);
         int32_to_seval(ret, &s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_muteLocalAudioStream : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_muteLocalAudioStream : Error processing arguments");
         return true;
     }
     
@@ -2386,12 +2385,12 @@ static bool js_cocos2dx_extension_agoraAudio_muteLocalAudioStream(se::State& s) 
     return false;
     
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_muteLocalAudioStream)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_muteLocalAudioStream)
 
-static bool js_cocos2dx_extension_agoraAudio_muteAllRemoteAudioStreams(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_muteAllRemoteAudioStreams(se::State& s) {
     CCLOG("muteLocalAudioStream() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_muteAllRemoteAudioStreams: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_muteAllRemoteAudioStreams: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2403,7 +2402,7 @@ static bool js_cocos2dx_extension_agoraAudio_muteAllRemoteAudioStreams(se::State
         int  ret = cobj->muteAllRemoteAudioStreams(bVal);
         int32_to_seval(ret, &s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_muteAllRemoteAudioStreams : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_muteAllRemoteAudioStreams : Error processing arguments");
         return true;
     }
     
@@ -2411,12 +2410,12 @@ static bool js_cocos2dx_extension_agoraAudio_muteAllRemoteAudioStreams(se::State
     return false;
     
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_muteAllRemoteAudioStreams)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_muteAllRemoteAudioStreams)
 
-static bool js_cocos2dx_extension_agoraAudio_muteRemoteAudioStream(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_muteRemoteAudioStream(se::State& s) {
     CCLOG("muteRemoteAudioStream() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_muteRemoteAudioStream: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_muteRemoteAudioStream: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2431,7 +2430,7 @@ static bool js_cocos2dx_extension_agoraAudio_muteRemoteAudioStream(se::State& s)
         int  ret = cobj->muteRemoteAudioStream(uid, bVal);
         int32_to_seval(ret, &s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_muteRemoteAudioStream : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_muteRemoteAudioStream : Error processing arguments");
         return true;
     }
     
@@ -2439,12 +2438,12 @@ static bool js_cocos2dx_extension_agoraAudio_muteRemoteAudioStream(se::State& s)
     return false;
     
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_muteRemoteAudioStream)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_muteRemoteAudioStream)
 
-static bool js_cocos2dx_extension_agoraAudio_setDefaultAudioRouteToSpeakerphone(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_setDefaultAudioRouteToSpeakerphone(se::State& s) {
     CCLOG("setDefaultAudioRouteToSpeakerphone() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setDefaultAudioRouteToSpeakerphone: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setDefaultAudioRouteToSpeakerphone: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2456,19 +2455,19 @@ static bool js_cocos2dx_extension_agoraAudio_setDefaultAudioRouteToSpeakerphone(
         int  ret = cobj->setDefaultAudioRouteToSpeakerphone(bVal);
         int32_to_seval(ret, &s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_setDefaultAudioRouteToSpeakerphone : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_setDefaultAudioRouteToSpeakerphone : Error processing arguments");
         return true;
     }
     
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setDefaultAudioRouteToSpeakerphone)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setDefaultAudioRouteToSpeakerphone)
 
-static bool js_cocos2dx_extension_agoraAudio_setEnableSpeakerphone(se::State& s) {
+static bool js_cocos2dx_extension_agoraCreator_setEnableSpeakerphone(se::State& s) {
     CCLOG("setEnableSpeakerphone() !!!");
     IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraAudio_setEnableSpeakerphone: Invalid Native Object");
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setEnableSpeakerphone: Invalid Native Object");
     const auto& args = s.args();
     size_t argc = args.size();
     CC_UNUSED bool ok = true;
@@ -2480,18 +2479,18 @@ static bool js_cocos2dx_extension_agoraAudio_setEnableSpeakerphone(se::State& s)
         int  ret = cobj->setEnableSpeakerphone(bVal);
         int32_to_seval(ret, &s.rval());
         
-        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraAudio_setEnableSpeakerphone : Error processing arguments");
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_setEnableSpeakerphone : Error processing arguments");
         return true;
     }
     
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC(js_cocos2dx_extension_agoraAudio_setEnableSpeakerphone)
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setEnableSpeakerphone)
 
 
-static bool js_agoraAudio_finalize(se::State& s){
-    CCLOGINFO("jsbindings: finalizing JS object %p (agoraAudio)", s.nativeThisObject());
+static bool js_agoraCreator_finalize(se::State& s){
+    CCLOGINFO("jsbindings: finalizing JS object %p (agoraCreator)", s.nativeThisObject());
     auto iter = se::NonRefNativePtrCreatedByCtorMap::find(s.nativeThisObject());
     if (iter != se::NonRefNativePtrCreatedByCtorMap::end())
     {
@@ -2504,14 +2503,14 @@ static bool js_agoraAudio_finalize(se::State& s){
     }
     return true;
 }
-SE_BIND_FINALIZE_FUNC(js_agoraAudio_finalize)
+SE_BIND_FINALIZE_FUNC(js_agoraCreator_finalize)
 
-static bool js_cocos2dx_extension_agoraAudio_constructor(se::State& s)
+static bool js_cocos2dx_extension_agoraCreator_constructor(se::State& s)
 {
     CCLOG("[Agora] constructor");
     
     if (g_SingleInstance == NULL){
-        g_SingleInstance = new CAgoraAudioJsWrapper();
+        g_SingleInstance = new CagoraCreatorJsWrapper();
     }
     
     se::Object* obj = s.thisObject();
@@ -2530,92 +2529,93 @@ static bool js_cocos2dx_extension_agoraAudio_constructor(se::State& s)
     
     return true;
 }
-SE_BIND_CTOR(js_cocos2dx_extension_agoraAudio_constructor, js_cocos2dx_agoraAudio_class, js_agoraAudio_finalize)
+SE_BIND_CTOR(js_cocos2dx_extension_agoraCreator_constructor, js_cocos2dx_agoraCreator_class, js_agoraCreator_finalize)
 
 
-bool js_register_cocos2dx_extension_agoraAudio(se::Object* obj)
+bool js_register_cocos2dx_extension_agoraCreator(se::Object* obj)
 {
-    CCLOG("[Agora] js_register_cocos2dx_extension_agoraAudio");
+    CCLOG("[Agora] js_register_cocos2dx_extension_agoraCreator");
     
-    auto cls = se::Class::create("agoraAudio", obj, nullptr, _SE(js_cocos2dx_extension_agoraAudio_constructor));
+    auto cls = se::Class::create("agoraCreator", obj, nullptr, _SE(js_cocos2dx_extension_agoraCreator_constructor));
     
-    cls->defineFunction("initialize", _SE(js_cocos2dx_extension_agoraAudio_initialize));
-    cls->defineFunction("joinChannel", _SE(js_cocos2dx_extension_agoraAudio_joinChannel));
-    cls->defineFunction("leaveChannel", _SE(js_cocos2dx_extension_agoraAudio_leaveChannel));
-    cls->defineFunction("getVersion", _SE(js_cocos2dx_extension_agoraAudio_getVersion));
-    cls->defineFunction("getErrorDescription", _SE(js_cocos2dx_extension_agoraAudio_getErrorDescription));
-    cls->defineFunction("setLogFilter", _SE(js_cocos2dx_extension_agoraAudio_setLogFilter));
-    cls->defineFunction("setLogFile", _SE(js_cocos2dx_extension_agoraAudio_setLogFile));
-    cls->defineFunction("renewToken", _SE(js_cocos2dx_extension_agoraAudio_renewToken));
-    cls->defineFunction("setChannelProfile", _SE(js_cocos2dx_extension_agoraAudio_setChannelProfile));
-    cls->defineFunction("setClientRole", _SE(js_cocos2dx_extension_agoraAudio_setClientRole));
+    cls->defineFunction("initialize", _SE(js_cocos2dx_extension_agoraCreator_initialize));
+    cls->defineFunction("joinChannel", _SE(js_cocos2dx_extension_agoraCreator_joinChannel));
+    cls->defineFunction("leaveChannel", _SE(js_cocos2dx_extension_agoraCreator_leaveChannel));
+    cls->defineFunction("getVersion", _SE(js_cocos2dx_extension_agoraCreator_getVersion));
+    cls->defineFunction("getErrorDescription", _SE(js_cocos2dx_extension_agoraCreator_getErrorDescription));
+    cls->defineFunction("setLogFilter", _SE(js_cocos2dx_extension_agoraCreator_setLogFilter));
+    cls->defineFunction("setLogFile", _SE(js_cocos2dx_extension_agoraCreator_setLogFile));
+    cls->defineFunction("renewToken", _SE(js_cocos2dx_extension_agoraCreator_renewToken));
+    cls->defineFunction("setChannelProfile", _SE(js_cocos2dx_extension_agoraCreator_setChannelProfile));
+    cls->defineFunction("setClientRole", _SE(js_cocos2dx_extension_agoraCreator_setClientRole));
 
-    cls->defineFunction("enableLocalAudio", _SE(js_cocos2dx_extension_agoraAudio_enableLocalAudio));
-    cls->defineFunction("setDefaultMuteAllRemoteAudioStreams", _SE(js_cocos2dx_extension_agoraAudio_setDefaultMuteAllRemoteAudioStreams));
+    cls->defineFunction("enableLocalAudio", _SE(js_cocos2dx_extension_agoraCreator_enableLocalAudio));
+    cls->defineFunction("setDefaultMuteAllRemoteAudioStreams", _SE(js_cocos2dx_extension_agoraCreator_setDefaultMuteAllRemoteAudioStreams));
     
-    cls->defineFunction("setInEarMonitoringVolume", _SE(js_cocos2dx_extension_agoraAudio_setInEarMonitoringVolume));
-    cls->defineFunction("isSpeakerphoneEnabled", _SE(js_cocos2dx_extension_agoraAudio_isSpeakerphoneEnabled));
-    cls->defineFunction("setEncryptionMode", _SE(js_cocos2dx_extension_agoraAudio_setEncryptionMode));
-    cls->defineFunction("enableWebSdkInteroperability", _SE(js_cocos2dx_extension_agoraAudio_enableWebSdkInteroperability));
-    cls->defineFunction("setHighQualityAudioParameters", _SE(js_cocos2dx_extension_agoraAudio_setHighQualityAudioParameters));
-    cls->defineFunction("adjustPlaybackSignalVolume", _SE(js_cocos2dx_extension_agoraAudio_adjustPlaybackSignalVolume));
-    cls->defineFunction("adjustRecordingSignalVolume", _SE(js_cocos2dx_extension_agoraAudio_adjustRecordingSignalVolume));
-    cls->defineFunction("resumeAudio", _SE(js_cocos2dx_extension_agoraAudio_resumeAudio));
-    cls->defineFunction("pauseAudio", _SE(js_cocos2dx_extension_agoraAudio_pauseAudio));
-    cls->defineFunction("setLocalVoiceReverb", _SE(js_cocos2dx_extension_agoraAudio_setLocalVoiceReverb));
-    cls->defineFunction("setLocalVoiceEqualization", _SE(js_cocos2dx_extension_agoraAudio_setLocalVoiceEqualization));
-    cls->defineFunction("setVoiceOnlyMode", _SE(js_cocos2dx_extension_agoraAudio_setVoiceOnlyMode));
-    cls->defineFunction("setRemoteVoicePosition", _SE(js_cocos2dx_extension_agoraAudio_setRemoteVoicePosition));
-    cls->defineFunction("setLocalVoicePitch", _SE(js_cocos2dx_extension_agoraAudio_setLocalVoicePitch));
-    cls->defineFunction("resumeAllEffects", _SE(js_cocos2dx_extension_agoraAudio_resumeAllEffects));
+    cls->defineFunction("setInEarMonitoringVolume", _SE(js_cocos2dx_extension_agoraCreator_setInEarMonitoringVolume));
+    cls->defineFunction("isSpeakerphoneEnabled", _SE(js_cocos2dx_extension_agoraCreator_isSpeakerphoneEnabled));
+    cls->defineFunction("setEncryptionMode", _SE(js_cocos2dx_extension_agoraCreator_setEncryptionMode));
+    cls->defineFunction("enableWebSdkInteroperability", _SE(js_cocos2dx_extension_agoraCreator_enableWebSdkInteroperability));
+    cls->defineFunction("setHighQualityAudioParameters", _SE(js_cocos2dx_extension_agoraCreator_setHighQualityAudioParameters));
+    cls->defineFunction("adjustPlaybackSignalVolume", _SE(js_cocos2dx_extension_agoraCreator_adjustPlaybackSignalVolume));
+    cls->defineFunction("adjustRecordingSignalVolume", _SE(js_cocos2dx_extension_agoraCreator_adjustRecordingSignalVolume));
+    cls->defineFunction("resumeAudio", _SE(js_cocos2dx_extension_agoraCreator_resumeAudio));
+    cls->defineFunction("pauseAudio", _SE(js_cocos2dx_extension_agoraCreator_pauseAudio));
+    cls->defineFunction("setLocalVoiceReverb", _SE(js_cocos2dx_extension_agoraCreator_setLocalVoiceReverb));
+    cls->defineFunction("setLocalVoiceEqualization", _SE(js_cocos2dx_extension_agoraCreator_setLocalVoiceEqualization));
+    cls->defineFunction("setVoiceOnlyMode", _SE(js_cocos2dx_extension_agoraCreator_setVoiceOnlyMode));
+    cls->defineFunction("setRemoteVoicePosition", _SE(js_cocos2dx_extension_agoraCreator_setRemoteVoicePosition));
+    cls->defineFunction("setLocalVoicePitch", _SE(js_cocos2dx_extension_agoraCreator_setLocalVoicePitch));
+    cls->defineFunction("resumeAllEffects", _SE(js_cocos2dx_extension_agoraCreator_resumeAllEffects));
     
-    cls->defineFunction("resumeEffect", _SE(js_cocos2dx_extension_agoraAudio_resumeEffect));
-    cls->defineFunction("pauseAllEffects", _SE(js_cocos2dx_extension_agoraAudio_pauseAllEffects));
-    cls->defineFunction("pauseEffect", _SE(js_cocos2dx_extension_agoraAudio_pauseEffect));
-    cls->defineFunction("unloadEffect", _SE(js_cocos2dx_extension_agoraAudio_unloadEffect));
-    cls->defineFunction("preloadEffect", _SE(js_cocos2dx_extension_agoraAudio_preloadEffect));
-    cls->defineFunction("stopAllEffects", _SE(js_cocos2dx_extension_agoraAudio_stopAllEffects));
-    cls->defineFunction("stopEffect", _SE(js_cocos2dx_extension_agoraAudio_stopEffect));
-    cls->defineFunction("playEffect", _SE(js_cocos2dx_extension_agoraAudio_playEffect));
-    cls->defineFunction("setVolumeOfEffect", _SE(js_cocos2dx_extension_agoraAudio_setVolumeOfEffect));
-    cls->defineFunction("setEffectsVolume", _SE(js_cocos2dx_extension_agoraAudio_setEffectsVolume));
-    cls->defineFunction("getEffectsVolume", _SE(js_cocos2dx_extension_agoraAudio_getEffectsVolume));
-    cls->defineFunction("setAudioMixingPosition", _SE(js_cocos2dx_extension_agoraAudio_setAudioMixingPosition));
+    cls->defineFunction("resumeEffect", _SE(js_cocos2dx_extension_agoraCreator_resumeEffect));
+    cls->defineFunction("pauseAllEffects", _SE(js_cocos2dx_extension_agoraCreator_pauseAllEffects));
+    cls->defineFunction("pauseEffect", _SE(js_cocos2dx_extension_agoraCreator_pauseEffect));
+    cls->defineFunction("unloadEffect", _SE(js_cocos2dx_extension_agoraCreator_unloadEffect));
+    cls->defineFunction("preloadEffect", _SE(js_cocos2dx_extension_agoraCreator_preloadEffect));
+    cls->defineFunction("stopAllEffects", _SE(js_cocos2dx_extension_agoraCreator_stopAllEffects));
+    cls->defineFunction("stopEffect", _SE(js_cocos2dx_extension_agoraCreator_stopEffect));
+    cls->defineFunction("playEffect", _SE(js_cocos2dx_extension_agoraCreator_playEffect));
+    cls->defineFunction("setVolumeOfEffect", _SE(js_cocos2dx_extension_agoraCreator_setVolumeOfEffect));
+    cls->defineFunction("setEffectsVolume", _SE(js_cocos2dx_extension_agoraCreator_setEffectsVolume));
+    cls->defineFunction("getEffectsVolume", _SE(js_cocos2dx_extension_agoraCreator_getEffectsVolume));
+    cls->defineFunction("setAudioMixingPosition", _SE(js_cocos2dx_extension_agoraCreator_setAudioMixingPosition));
     
-    cls->defineFunction("getAudioMixingCurrentPosition", _SE(js_cocos2dx_extension_agoraAudio_getAudioMixingCurrentPosition));
-    cls->defineFunction("getAudioMixingDuration", _SE(js_cocos2dx_extension_agoraAudio_getAudioMixingDuration));
-    cls->defineFunction("adjustAudioMixingVolume", _SE(js_cocos2dx_extension_agoraAudio_adjustAudioMixingVolume));
-    cls->defineFunction("resumeAudioMixing", _SE(js_cocos2dx_extension_agoraAudio_resumeAudioMixing));
-    cls->defineFunction("pauseAudioMixing", _SE(js_cocos2dx_extension_agoraAudio_pauseAudioMixing));
-    cls->defineFunction("stopAudioMixing", _SE(js_cocos2dx_extension_agoraAudio_stopAudioMixing));
-    cls->defineFunction("startAudioMixing", _SE(js_cocos2dx_extension_agoraAudio_startAudioMixing));
-    cls->defineFunction("stopAudioRecording", _SE(js_cocos2dx_extension_agoraAudio_stopAudioRecording));
-    cls->defineFunction("startAudioRecording", _SE(js_cocos2dx_extension_agoraAudio_startAudioRecording));
-    cls->defineFunction("enableAudioVolumeIndication", _SE(js_cocos2dx_extension_agoraAudio_enableAudioVolumeIndication));
-    cls->defineFunction("setPlaybackDeviceVolume", _SE(js_cocos2dx_extension_agoraAudio_setPlaybackDeviceVolume));
+    cls->defineFunction("getAudioMixingCurrentPosition", _SE(js_cocos2dx_extension_agoraCreator_getAudioMixingCurrentPosition));
+    cls->defineFunction("getAudioMixingDuration", _SE(js_cocos2dx_extension_agoraCreator_getAudioMixingDuration));
+    cls->defineFunction("adjustAudioMixingVolume", _SE(js_cocos2dx_extension_agoraCreator_adjustAudioMixingVolume));
+    cls->defineFunction("resumeAudioMixing", _SE(js_cocos2dx_extension_agoraCreator_resumeAudioMixing));
+    cls->defineFunction("pauseAudioMixing", _SE(js_cocos2dx_extension_agoraCreator_pauseAudioMixing));
+    cls->defineFunction("stopAudioMixing", _SE(js_cocos2dx_extension_agoraCreator_stopAudioMixing));
+    cls->defineFunction("startAudioMixing", _SE(js_cocos2dx_extension_agoraCreator_startAudioMixing));
+    cls->defineFunction("stopAudioRecording", _SE(js_cocos2dx_extension_agoraCreator_stopAudioRecording));
+    cls->defineFunction("startAudioRecording", _SE(js_cocos2dx_extension_agoraCreator_startAudioRecording));
+    cls->defineFunction("enableAudioVolumeIndication", _SE(js_cocos2dx_extension_agoraCreator_enableAudioVolumeIndication));
+    // Non-mobile devices api
+    //cls->defineFunction("setPlaybackDeviceVolume", _SE(js_cocos2dx_extension_agoraCreator_setPlaybackDeviceVolume));
     
-    cls->defineFunction("enableAudio", _SE(js_cocos2dx_extension_agoraAudio_enableAudio));
-    cls->defineFunction("disableAudio", _SE(js_cocos2dx_extension_agoraAudio_disableAudio));
-    cls->defineFunction("muteLocalAudioStream", _SE(js_cocos2dx_extension_agoraAudio_muteLocalAudioStream));
-    cls->defineFunction("muteAllRemoteAudioStreams", _SE(js_cocos2dx_extension_agoraAudio_muteAllRemoteAudioStreams));
-    cls->defineFunction("muteRemoteAudioStream", _SE(js_cocos2dx_extension_agoraAudio_muteRemoteAudioStream));
-    cls->defineFunction("setDefaultAudioRouteToSpeakerphone", _SE(js_cocos2dx_extension_agoraAudio_setDefaultAudioRouteToSpeakerphone));
-    cls->defineFunction("setEnableSpeakerphone", _SE(js_cocos2dx_extension_agoraAudio_setEnableSpeakerphone));
+    cls->defineFunction("enableAudio", _SE(js_cocos2dx_extension_agoraCreator_enableAudio));
+    cls->defineFunction("disableAudio", _SE(js_cocos2dx_extension_agoraCreator_disableAudio));
+    cls->defineFunction("muteLocalAudioStream", _SE(js_cocos2dx_extension_agoraCreator_muteLocalAudioStream));
+    cls->defineFunction("muteAllRemoteAudioStreams", _SE(js_cocos2dx_extension_agoraCreator_muteAllRemoteAudioStreams));
+    cls->defineFunction("muteRemoteAudioStream", _SE(js_cocos2dx_extension_agoraCreator_muteRemoteAudioStream));
+    cls->defineFunction("setDefaultAudioRouteToSpeakerphone", _SE(js_cocos2dx_extension_agoraCreator_setDefaultAudioRouteToSpeakerphone));
+    cls->defineFunction("setEnableSpeakerphone", _SE(js_cocos2dx_extension_agoraCreator_setEnableSpeakerphone));
 
-    cls->defineFinalizeFunction(_SE(js_agoraAudio_finalize));
+    cls->defineFinalizeFunction(_SE(js_agoraCreator_finalize));
     cls->install();
 
-    js_cocos2dx_agoraAudio_prototype = cls->getProto();
-    js_cocos2dx_agoraAudio_class = cls;
+    js_cocos2dx_agoraCreator_prototype = cls->getProto();
+    js_cocos2dx_agoraCreator_class = cls;
     
     se::ScriptEngine::getInstance()->clearException();
     return true;
 }
 
-bool register_jsb_agoraAudio(se::Object* obj)
+bool register_jsb_agoraCreator(se::Object* obj)
 {
-    CCLOG("[Agora] register_jsb_agoraAudio");
-    return js_register_cocos2dx_extension_agoraAudio(obj);
+    CCLOG("[Agora] register_jsb_agoraCreator");
+    return js_register_cocos2dx_extension_agoraCreator(obj);
 }
 
 #endif 

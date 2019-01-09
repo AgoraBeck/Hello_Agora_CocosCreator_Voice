@@ -1,32 +1,32 @@
 
 - JS API 接口：提供纯语音版游戏 SDK 在 CocosCreate平台上的其他方法和回调，包括：
-   * [主要方法](#agoraAudioInst)
+   * [主要方法](#agoraCreatorInst)
    * [语音控制方法](#rtcengineparameters)
    * [主回调事件](#irtcengineeventhandler)
    * [错误代码和警告代码](#irtcerror)
 
-<a id = "agoraAudioInst"></a>
-### 主要方法 (agoraAudioInst)
+<a id = "agoraCreatorInst"></a>
+### 主要方法 (agoraCreatorInst)
 
-#### 创建agoraAudio对象
+#### 创建agoraCreator对象
 
 ```
-var agoraAudio = require("agoraAudio");
+var agoraCreator = require("agoraCreator");
 
-agoraAudio.createEngine("AGORA APP ID");  
+agoraCreator.createEngine("AGORA APP ID");  
 ```
 
 注意: 在整个应用全局，开发者只需要对引擎做一次初始化。另外引擎的异步调用的回调，如：加入频道成功、退出频道成功等消息，都在同一个对象里。
 
 Agora 音频实时云传输服务，不区分调试环境和正式环境。
 
-创建agoraAudio对象，返回实例agoraAudioInst对象。agoraAudioInst对象提供的接口方法，如无特殊说明，都是异步调用，对接口的调用建议在同一个线程进行。 所有返回值为 int 型的 API，如无特殊说明，返回值 0 为调用成功，返回值小于 0 为调用失败。
+创建agoraCreator对象，返回实例agoraCreatorInst对象。agoraCreatorInst对象提供的接口方法，如无特殊说明，都是异步调用，对接口的调用建议在同一个线程进行。 所有返回值为 int 型的 API，如无特殊说明，返回值 0 为调用成功，返回值小于 0 为调用失败。
 
 
 #### 设置频道属性 (setChannelProfile)
 
 ```
-agoraAudioInst.setChannelProfile(profile);
+agoraCreatorInst.setChannelProfile(profile);
 ```
 
 该方法用于设置频道模式(Profile)。引擎需知道应用程序的使用场景(例如通信模式或直播模式), 从而使用不同的优化手段。
@@ -94,7 +94,7 @@ agoraAudioInst.setChannelProfile(profile);
 #### 设置用户角色 (setClientRole)
 
 ```
-agoraAudioInst.setClientRole(CLIENT_ROLE_TYPE role);
+agoraCreatorInst.setClientRole(CLIENT_ROLE_TYPE role);
 ```
 
 直播模式下，在加入频道前，用户需要通过本方法设置观众(默认)或主播模式；在加入频道后，用户可以通过本方法切换用户模式。
@@ -131,7 +131,7 @@ agoraAudioInst.setClientRole(CLIENT_ROLE_TYPE role);
 #### 打开音频 (enableAudio)
 
 ```
-agoraAudioInst.enableAudio();
+agoraCreatorInst.enableAudio();
 ```
 
 打开音频(默认为开启状态)。返回值:
@@ -145,7 +145,7 @@ agoraAudioInst.enableAudio();
 #### 关闭/重启本地语音功能 (enableLocalAudio)
 
 ```
-agoraAudioInst.enableLocalAudio(bool enabled);
+agoraCreatorInst.enableLocalAudio(bool enabled);
 ```
 
 当用户加入频道时，语音功能默认是开启的。该方法可以关闭或重新开启本地语音功能，停止或重新开始本地音频采集及处理。
@@ -187,7 +187,7 @@ agoraAudioInst.enableLocalAudio(bool enabled);
 #### 关闭音频 (disableAudio)
 
 ```
-agoraAudioInst.disableAudio();
+agoraCreatorInst.disableAudio();
 ```
 
 关闭音频。返回值:
@@ -202,7 +202,7 @@ agoraAudioInst.disableAudio();
 #### 加入频道 (joinChannel)
 
 ```
-agoraAudioInst.joinChannel(token, channelId, info, uid);
+agoraCreatorInst.joinChannel(token, channelId, info, uid);
 ```
 
 该方法让用户加入通话频道，在同一个频道内的用户可以互相通话，多个用户加入同一个频道，可以群聊。 使用不同 App ID 的应用程序是不能互通的。如果已在通话中，用户必须调用 `leaveChannel()` 退出当前通话，才能进入下一个频道。
@@ -255,7 +255,7 @@ uid 在 SDK 内部用 32 位无符号整数表示，由于 Java 不支持无符�
 #### 离开频道 (leaveChannel)
 
 ```
-agoraAudioInst.leaveChannel();
+agoraCreatorInst.leaveChannel();
 ```
 
 离开频道，即挂断或退出通话。joinChannel后，必须调用 leaveChannel 以结束通话，否则不能进行下一次通话。 不管当前是否在通话中，都可以调用 leaveChannel，没有副作用。如果成功，则返回值为0。leaveChannel 会把会话相关的所有资源释放掉。
@@ -288,7 +288,7 @@ leaveChannel 是异步操作，调用返回时并没有真正退出频道。在�
 #### 设置本地语音音调 (setLocalVoicePitch)
 
 ```
-iagoraAudioInst.setLocalVoicePitch(pitch);
+iagoraCreatorInst.setLocalVoicePitch(pitch);
 ```
 
 该方法改变本地说话人声音的音调。
@@ -318,7 +318,7 @@ iagoraAudioInst.setLocalVoicePitch(pitch);
 #### 设置远端用户的语音位置 (setRemoteVoicePosition)
 
 ```
-agoraAudioInst.setRemoteVoicePosition(uid, pan, gain);
+agoraCreatorInst.setRemoteVoicePosition(uid, pan, gain);
 ```
 
 该方法设置远端用户的语音位置。
@@ -363,7 +363,7 @@ agoraAudioInst.setRemoteVoicePosition(uid, pan, gain);
 #### 设置仅限语音模式 (setVoiceOnlyMode)
 
 ```
-agoraAudioInst.setVoiceOnlyMode(bool enable);
+agoraCreatorInst.setVoiceOnlyMode(bool enable);
 ```
 
 该方法设置仅语音模式。即仅传输语音流，而不传输其他流，例如，敲键盘的声音等。
@@ -427,7 +427,7 @@ int setLocalVoiceEqualization(bandFrequency, int bandGain);
 #### 设置本地音效混响 (setLocalVoiceReverb)
 
 ```
-agoraAudioInst.setLocalVoiceReverb(reverbKey, value);
+agoraCreatorInst.setLocalVoiceReverb(reverbKey, value);
 ```
 
 该方法设置本地音效混响。
@@ -463,7 +463,7 @@ agoraAudioInst.setLocalVoiceReverb(reverbKey, value);
 #### 获取音效音量 (getEffectsVolume)
 
 ```
-agoraAudioInst.getEffectsVolume();
+agoraCreatorInst.getEffectsVolume();
 ```
 
 该方法获取音效的音量，范围为 \[0.0, 100.0\]。
@@ -471,7 +471,7 @@ agoraAudioInst.getEffectsVolume();
 #### 设置音量音效 (setEffectsVolume)
 
 ```
-agoraAudioInst.setEffectsVolume(volume);
+agoraCreatorInst.setEffectsVolume(volume);
 ```
 
 该方法设置音效的音量。
@@ -504,7 +504,7 @@ agoraAudioInst.setEffectsVolume(volume);
 #### 实时调整音效音量 (setVolumeOfEffect)
 
 ```
-agoraAudioInst.setVolumeOfEffect(soundId, volume);
+agoraCreatorInst.setVolumeOfEffect(soundId, volume);
 ```
 
 该方法实时调整指定音效的音量。
@@ -540,7 +540,7 @@ agoraAudioInst.setVolumeOfEffect(soundId, volume);
 #### 播放指定音效 (playEffect)
 
 ```
-agoraAudioInst.playEffect(soundId, filePath, loopCount, pitch, pan, gain, publish);
+agoraCreatorInst.playEffect(soundId, filePath, loopCount, pitch, pan, gain, publish);
 ```
 
 该方法播放指定音效。
@@ -613,7 +613,7 @@ agoraAudioInst.playEffect(soundId, filePath, loopCount, pitch, pan, gain, publis
 #### 停止播放指定音效 (stopEffect)
 
 ```
-agoraAudioInst.stopEffect(soundId);
+agoraCreatorInst.stopEffect(soundId);
 ```
 
 <table>
@@ -859,7 +859,7 @@ int enableWebSdkInteroperability(bool enabled);
 #### 启用内置加密，并设置数据加密密码 (setEncryptionSecret)
 
 ```
-agoraAudioInst.setEncryptionSecret(const char* secret);
+agoraCreatorInst.setEncryptionSecret(const char* secret);
 ```
 
 在加入频道之前，应用程序需调用 `setEncryptionSecret()` 指定 secret 来启用内置的加密功能，同一频道内的所有用户应设置相同的 secret。 当用户离开频道时，该频道的 secret 会自动清除。如果未指定 secret 或将 secret 设置为空，则无法激活加密功能。
@@ -892,7 +892,7 @@ agoraAudioInst.setEncryptionSecret(const char* secret);
 #### 设置内置的加密方案 (setEncryptionMode)
 
 ```
-agoraAudioInst.setEncryptionMode(const char* encryptionMode);
+agoraCreatorInst.setEncryptionMode(const char* encryptionMode);
 ```
 
 Agora Native SDK 支持内置加密功能，默认使用 AES-128-XTS 加密方式。如需使用其他加密方式，可以调用该 API 设置。
@@ -939,7 +939,7 @@ Agora Native SDK 支持内置加密功能，默认使用 AES-128-XTS 加密方�
 #### 创建数据流 (createDataStream)
 
 ```
-agoraAudioInst.createDataStream(int* streamId, bool reliable, bool ordered);
+agoraCreatorInst.createDataStream(int* streamId, bool reliable, bool ordered);
 ```
 
 该方法用于创建数据流。频道内每人最多只能创建 5 个数据流。频道内数据通道最多允许数据延迟 5 秒，若超过 5 秒接收方尚未收到数据流，则数据通道会向应用程序报错。
@@ -989,7 +989,7 @@ agoraAudioInst.createDataStream(int* streamId, bool reliable, bool ordered);
 #### 更新 Token (renewToken)
 
 ```
-agoraAudioInst.renewToken(const char* token);
+agoraCreatorInst.renewToken(const char* token);
 ```
 
 该方法用于更新 Token。如果启用了 Token 机制，过一段时间后使用的 Token 会失效。
@@ -1030,7 +1030,7 @@ agoraAudioInst.renewToken(const char* token);
 #### 设置日志文件 (setLogFile)
 
 ```
-agoraAudioInst.setLogFile(filePath);
+agoraCreatorInst.setLogFile(filePath);
 ```
 
 设置 SDK 的输出 log 文件。SDK 运行时产生的所有 log 将写入该文件。应用程序必须保证指定的目录存在而且可写。
@@ -1064,7 +1064,7 @@ agoraAudioInst.setLogFile(filePath);
 #### 设置日志过滤器 (setLogFilter)
 
 ```
-iagoraAudioInst.setLogFilter(filter);
+iagoraCreatorInst.setLogFilter(filter);
 ```
 
 设置 SDK 的输出日志过滤等级。不同的过滤等级可以单独或组合使用。
@@ -1110,7 +1110,7 @@ iagoraAudioInst.setLogFilter(filter);
 #### 销毁IRtcEngine对象 (release)
 
 ```
-agoraAudioInst.release();
+agoraCreatorInst.release();
 ```
 
 该方法用于销毁 IRtcEngine 对象。
@@ -1150,7 +1150,7 @@ agoraAudioInst.release();
 #### 查询 SDK 版本号 (getVersion)
 
 ```
-agoraAudioInst.getVersion(build);
+agoraCreatorInst.getVersion(build);
 ```
 
 该方法返回 SDK 版本号的字符串。
@@ -1166,7 +1166,7 @@ agoraAudioInst.getVersion(build);
 #### 将自己静音 (muteLocalAudioStream)
 
 ```
-agoraAudioInst.muteLocalAudioStream(mute);
+agoraCreatorInst.muteLocalAudioStream(mute);
 ```
 
 静音/取消静音。该方法用于允许/禁止往网络发送本地音频流。
@@ -1205,7 +1205,7 @@ agoraAudioInst.muteLocalAudioStream(mute);
 #### 静音所有远端音频 (muteAllRemoteAudioStreams)
 
 ```
-agoraAudioInst.muteAllRemoteAudioStreams(mute);
+agoraCreatorInst.muteAllRemoteAudioStreams(mute);
 ```
 
 该方法用于允许/禁止播放远端用户的音频流，即对所有远端用户进行静音与否。
@@ -1241,7 +1241,7 @@ agoraAudioInst.muteAllRemoteAudioStreams(mute);
 #### 静音指定用户音频 (muteRemoteAudioStream)
 
 ```
-agoraAudioInst.muteRemoteAudioStream(uid, mute);
+agoraCreatorInst.muteRemoteAudioStream(uid, mute);
 ```
 
 静音指定远端用户/对指定远端用户取消静音。
@@ -1286,7 +1286,7 @@ agoraAudioInst.muteRemoteAudioStream(uid, mute);
 #### 启用说话者音量提示 (enableAudioVolumeIndication)
 
 ```
-agoraAudioInst.enableAudioVolumeIndication（interval, smooth);
+agoraCreatorInst.enableAudioVolumeIndication（interval, smooth);
 ```
 
 该方法允许 SDK 定期向应用程序反馈当前谁在说话以及说话者的音量。启用该方法后，无论频道内是否有人说话，都会在 `onAudioVolumeIndication` 回调中按设置的间隔时间返回音量提示。
@@ -1328,7 +1328,7 @@ agoraAudioInst.enableAudioVolumeIndication（interval, smooth);
 #### 开始播放伴奏 (startAudioMixing)
 
 ```
-agoraAudioInst.startAudioMixing(filePath, loopback, replace, cycle);
+agoraCreatorInst.startAudioMixing(filePath, loopback, replace, cycle);
 ```
 
 指定本地音频文件来和麦克风采集的音频流进行混音和替换(用音频文件替换麦克风采集的音频流)， 可以通过参数选择是否让对方听到本地播放的音频和指定循环播放的次数。
@@ -1382,7 +1382,7 @@ agoraAudioInst.startAudioMixing(filePath, loopback, replace, cycle);
 #### 停止播放伴奏 (stopAudioMixing)
 
 ```
-agoraAudioInst.stopAudioMixing();
+agoraCreatorInst.stopAudioMixing();
 ```
 
 该方法停止播放伴奏。请在频道内调用该方法。
@@ -1412,7 +1412,7 @@ agoraAudioInst.stopAudioMixing();
 #### 暂停播放伴奏 (pauseAudioMixing)
 
 ```
-agoraAudioInst.pauseAudioMixing();
+agoraCreatorInst.pauseAudioMixing();
 ```
 
 该方法暂停播放伴奏。请在频道内调用该方法。
@@ -1442,7 +1442,7 @@ agoraAudioInst.pauseAudioMixing();
 #### 恢复播放伴奏 (resumeAudioMixing)
 
 ```
-agoraAudioInst.resumeAudioMixing();
+agoraCreatorInst.resumeAudioMixing();
 ```
 
 该方法恢复混音，继续播放伴奏。请在频道内调用该方法。
@@ -1472,7 +1472,7 @@ agoraAudioInst.resumeAudioMixing();
 #### 调节伴奏音量 (adjustAudioMixingVolume)
 
 ```
-agoraAudioInst.adjustAudioMixingVolume（volume);
+agoraCreatorInst.adjustAudioMixingVolume（volume);
 ```
 
 该方法调节混音里伴奏的音量大小。请在频道内调用该方法。
@@ -1505,7 +1505,7 @@ agoraAudioInst.adjustAudioMixingVolume（volume);
 #### 获取伴奏时长 (getAudioMixingDuration)
 
 ```
-agoraAudioInst.getAudioMixingDuration();
+agoraCreatorInst.getAudioMixingDuration();
 ```
 
 该方法获取伴奏时长，单位为毫秒。请在频道内调用该方法。如果返回值 <0，表明调用失败。
@@ -1513,7 +1513,7 @@ agoraAudioInst.getAudioMixingDuration();
 #### 获取伴奏播放进度 (getAudioMixingCurrentPosition)
 
 ```
-agoraAudioInst.getAudioMixingCurrentPosition();
+agoraCreatorInst.getAudioMixingCurrentPosition();
 ```
 
 该方法获取当前伴奏播放进度，单位为毫秒。请在频道内调用该方法。
@@ -1521,7 +1521,7 @@ agoraAudioInst.getAudioMixingCurrentPosition();
 #### 拖动语音进度条 (setAudioMixingPosition)
 
 ```
-agoraAudioInst.setAudioMixingPosition（pos);
+agoraCreatorInst.setAudioMixingPosition（pos);
 ```
 
 该方法可以拖动播放音频文件的进度条，这样你可以根据实际情况播放文件，而不是非得从头到尾播放一个文件。
@@ -1545,7 +1545,7 @@ agoraAudioInst.setAudioMixingPosition（pos);
 #### 开始客户端录音 (startAudioRecording)
 
 ```
-agoraAudioInst.startAudioRecording(filePath, quality);
+agoraCreatorInst.startAudioRecording(filePath, quality);
 ```
 
 Agora SDK 支持通话过程中在客户端进行录音。该方法录制频道内所有用户的音频，并生成一个包含所有用户声音的录音文件，录音文件格式可以为:
@@ -1593,7 +1593,7 @@ Agora SDK 支持通话过程中在客户端进行录音。该方法录制频道�
 #### 停止客户端录音 (stopAudioRecording)
 
 ```
-agoraAudioInst.stopAudioRecording();
+agoraCreatorInst.stopAudioRecording();
 ```
 
 停止录音。该接口需要在 `leaveChannel()` 之前调用，不然会在调用 `leaveChannel()` 时自动停止。
@@ -1623,7 +1623,7 @@ agoraAudioInst.stopAudioRecording();
 #### 调节录音信号音量 (adjustRecordingSignalVolume)
 
 ```
-agoraAudioInst.adjustRecordingSignalVolume（volume);
+agoraCreatorInst.adjustRecordingSignalVolume（volume);
 ```
 
 该方法调节录音信号音量。
@@ -1665,7 +1665,7 @@ agoraAudioInst.adjustRecordingSignalVolume（volume);
 #### 调节播放信号音量 (adjustPlaybackSignalVolume)
 
 ```
-agoraAudioInst.adjustPlaybackSignalVolume（volume);
+agoraCreatorInst.adjustPlaybackSignalVolume（volume);
 ```
 
 该方法调节播放信号音量。
@@ -1711,7 +1711,7 @@ agora::IRtcEngineEventHandler 接口类用于 SDK 向应用程序发送回调事
 #### 加入频道回调 (onJoinChannelSuccess)
 
 ```
-agoraAudioInst.onJoinChannelSuccess(channel, uid, elapsed);
+agoraCreatorInst.onJoinChannelSuccess(channel, uid, elapsed);
 ```
 
 该回调方法表示该客户端成功加入了指定的频道。
@@ -1742,7 +1742,7 @@ agoraAudioInst.onJoinChannelSuccess(channel, uid, elapsed);
 #### 重新加入频道回调 (onRejoinChannelSuccess)
 
 ```
-agoraAudioInst.onRejoinChannelSuccess(channel, uid, elapsed);
+agoraCreatorInst.onRejoinChannelSuccess(channel, uid, elapsed);
 ```
 
 有时候由于网络原因，客户端可能会和服务器失去连接，SDK会进行自动重连，自动重连成功后触发此回调方法。
@@ -1773,7 +1773,7 @@ agoraAudioInst.onRejoinChannelSuccess(channel, uid, elapsed);
 #### 发生警告回调 (onWarning)
 
 ```
-agoraAudioInst.onWarning（warn, msg);
+agoraCreatorInst.onWarning（warn, msg);
 ```
 
 该回调方法表示SDK运行时出现了（网络或媒体相关的）警告。通常情况下，SDK上报的警告信息应用程序可以忽略，SDK会自动恢复。比如和服务器失去连接时，SDK可能会上报ERR_OPEN_CHANNEL_TIMEOUT警告，同时自动尝试重连。
@@ -1799,7 +1799,7 @@ agoraAudioInst.onWarning（warn, msg);
 #### 发生错误回调 (onError)
 
 ```
-agoraAudioInst.onError（err, msg);
+agoraCreatorInst.onError（err, msg);
 ```
 
 该回调方法表示 SDK 运行时出现了（网络或媒体相关的）错误。通常情况下，SDK上报的错误意味着SDK无法自动恢复，需要应用程序干预或提示用户。 比如启动通话失败时，SDK 会上报 ERR_START_CALL 错误。应用程序可以提示用户启动通话失败，并调用 leaveChannel 退出频道。
@@ -1825,7 +1825,7 @@ agoraAudioInst.onError（err, msg);
 #### API 已执行回调 (onApiCallExecuted)
 
 ```
-agoraAudioInst.onApiCallExecuted（err, api, result);
+agoraCreatorInst.onApiCallExecuted（err, api, result);
 ```
 
 当 SDK 执行相应的 API 后，会触发该回调。
@@ -1854,7 +1854,7 @@ agoraAudioInst.onApiCallExecuted（err, api, result);
 #### 麦克风状态已改变回调 (onMicrophoneEnabled)
 
 ```
-agoraAudioInst.onMicrophoneEnabled(enabled)
+agoraCreatorInst.onMicrophoneEnabled(enabled)
 ```
 
 <table>
@@ -1880,7 +1880,7 @@ agoraAudioInst.onMicrophoneEnabled(enabled)
 #### 声音质量回调 (onAudioQuality)
 
 ```
-agoraAudioInst.onAudioQuality(uid, quality,  delay, lost);
+agoraCreatorInst.onAudioQuality(uid, quality,  delay, lost);
 ```
 
 在通话中，该回调方法每两秒触发一次，报告当前通话的（嘴到耳）音频质量。
@@ -1924,7 +1924,7 @@ agoraAudioInst.onAudioQuality(uid, quality,  delay, lost);
 #### 说话声音音量提示回调 (onAudioVolumeIndication)
 
 ```
-agoraAudioInst.onAudioVolumeIndication(speakers, speakerNumber, totalVolume);
+agoraCreatorInst.onAudioVolumeIndication(speakers, speakerNumber, totalVolume);
 ```
 
 该回调提示频道内谁在说话以及说话者的音量。默认禁用。可以通过 `enableAudioVolumeIndication` 方法开启；开启后，无论频道内是否有人说话，都会按方法中设置的时间间隔返回提示音量。
@@ -1970,7 +1970,7 @@ agoraAudioInst.onAudioVolumeIndication(speakers, speakerNumber, totalVolume);
 #### 离开频道回调 (onLeaveChannel)
 
 ```
-agoraAudioInst.onLeaveChannel(stat);
+agoraCreatorInst.onLeaveChannel(stat);
 ```
 
 应用程序调用 leaveChannel()方法时，SDK提示应用程序离开频道成功。在该回调方法中，应用程序可以得到此次通话的总通话时长、SDK收发数据的流量等信息。
@@ -2033,7 +2033,7 @@ struct stat
 #### 其他用户加入当前频道回调 (onUserJoined)
 
 ```
-agoraAudioInst.onUserJoined(uid, elapsed);
+agoraCreatorInst.onUserJoined(uid, elapsed);
 ```
 
 该回调提示有主播加入了频道，并返回该主播的 ID。如果在加入之前，已经有主播在频道中了，新加入的用户也会收到已有主播加入频道的回调。Agora 建议连麦主播不超过 17 人。
@@ -2067,7 +2067,7 @@ agoraAudioInst.onUserJoined(uid, elapsed);
 #### 其他用户离开当前频道回调 (onUserOffline)
 
 ```
-agoraAudioInst.onUserOffline(uid, reason);
+agoraCreatorInst.onUserOffline(uid, reason);
 ```
 
 提示有主播离开了频道（或掉线）。SDK 判断用户离开频道（或掉线）的依据是超时：在一定时间内（15秒）没有收到对方的任何数据包，判定为对方掉线。 在网络较差的情况下，可能会有误报。建议可靠的掉线检测应该由信令来做。
@@ -2104,7 +2104,7 @@ agoraAudioInst.onUserOffline(uid, reason);
 #### 当前通话统计回调 (onRtcStats)
 
 ```
-agoraAudioInst.onRtcStats(stats);
+agoraCreatorInst.onRtcStats(stats);
 ```
 
 SDK定期向应用程序报告当前通话的统计信息，每两秒触发一次。
@@ -2129,7 +2129,7 @@ SDK定期向应用程序报告当前通话的统计信息，每两秒触发一�
 #### 收到远端音频回调 (onFirstRemoteAudioFrame)
 
 ```
-agoraAudioInst.onFirstRemoteAudioFrame(uid, elapsed)
+agoraCreatorInst.onFirstRemoteAudioFrame(uid, elapsed)
 ```
 
 当接收到远端音频第一帧时，触发此回调。
@@ -2156,7 +2156,7 @@ agoraAudioInst.onFirstRemoteAudioFrame(uid, elapsed)
 #### 网络质量报告回调 (onLastmileQuality)
 
 ```
-agoraAudioInst.onLastmileQuality（quality);
+agoraCreatorInst.onLastmileQuality（quality);
 ```
 
 报告本地用户的网络质量。当你调用 enableLastmileTest 之后，该回调函数每 2 秒触发一次。 不在通话中时，如果启用了网络质量测试功能（enableLastmileTest），该回调方法会被不定期触发，向应用程序上报当前网络连接质量。
@@ -2192,7 +2192,7 @@ agoraAudioInst.onLastmileQuality（quality);
 #### 频道内网络质量报告回调 (onNetworkQuality)
 
 ```
-agoraAudioInst.onNetworkQuality(uid, txQuality, rxQuality);
+agoraCreatorInst.onNetworkQuality(uid, txQuality, rxQuality);
 ```
 
 该回调每 2 秒触发，向APP报告频道内所有用户当前的上行、下行网络质量。
@@ -2243,7 +2243,7 @@ agoraAudioInst.onNetworkQuality(uid, txQuality, rxQuality);
 #### 用户静音回调 (onUserMuteAudio)
 
 ```
-agoraAudioInst.onUserMuteAudio(uid, muted);
+agoraCreatorInst.onUserMuteAudio(uid, muted);
 ```
 
 提示有其他用户已将其音频流静音（或取消静音）。
@@ -2277,7 +2277,7 @@ agoraAudioInst.onUserMuteAudio(uid, muted);
 #### 网络中断回调 (onConnectionInterrupted)
 
 ```
-agoraAudioInst.onConnectionInterrupted();
+agoraCreatorInst.onConnectionInterrupted();
 ```
 
 该回调方法表示 SDK 和服务器失去了网络连接。
@@ -2287,7 +2287,7 @@ agoraAudioInst.onConnectionInterrupted();
 #### 连接丢失回调 (onConnectionLost)
 
 ```
-agoraAudioInst.onConnectionLost();
+agoraCreatorInst.onConnectionLost();
 ```
 
 在 SDK 和服务器失去了网络连接后，会触发 onConnectionInterrupted 回调，并自动重连。如果重连一段时间（默认 10 秒）后仍未连上，会触发该回调。 如果 SDK 在调用 joinChannel 后 10 秒内没有成功加入频道，也会触发该回调。 该回调触发后，SDK 仍然会尝试重连，重连成功后会触发 onRejoinChannelSuccess 回调。
@@ -2295,7 +2295,7 @@ agoraAudioInst.onConnectionLost();
 #### 连接已被禁止回调 (onConnectionBanned)
 
 ```
-agoraAudioInst.onConnectionBanned();
+agoraCreatorInst.onConnectionBanned();
 ```
 
 当你被服务端禁掉连接的权限时，会触发该回调。
@@ -2304,7 +2304,7 @@ agoraAudioInst.onConnectionBanned();
 #### Token 过期回调 (onRequestToken)
 
 ```
-agoraAudioInst.onRequestToken();
+agoraCreatorInst.onRequestToken();
 ```
 
 在调用 joinChannel 时如果指定了 Token，由于 Token 具有一定的时效，在通话过程中 SDK 可能由于网络原因和服务器失去连接，重连时可能需要新的 Token。 该回调通知 APP 需要生成新的 token，并需调用 renewToken() 为 SDK 指定新的 Token 。
@@ -2314,7 +2314,7 @@ agoraAudioInst.onRequestToken();
 #### 伴奏播放已结束回调 (onAudioMixingFinished)
 
 ```
-agoraAudioInst.onAudioMixingFinished()
+agoraCreatorInst.onAudioMixingFinished()
 ```
 
 当调用 startAudioMixing 播放伴奏音乐结束后，会触发该回调。如果调用 startAudioMixing 失败，会在 onError 回调里，返回错误码 WARN_AUDIO_MIXING_OPEN_ERROR 。
@@ -2322,7 +2322,7 @@ agoraAudioInst.onAudioMixingFinished()
 #### 音效播放已结束回调 (onAudioEffectFinished)
 
 ```
-agoraAudioInst.onAudioEffectFinished（soundId)
+agoraCreatorInst.onAudioEffectFinished（soundId)
 ```
 
 当指定的音效播放结束后，会触发该回调。
@@ -2347,7 +2347,7 @@ agoraAudioInst.onAudioEffectFinished（soundId)
 #### 监测到活跃用户回调 (onActiveSpeaker)
 
 ```
-agoraAudioInst.onActiveSpeaker(uid);
+agoraCreatorInst.onActiveSpeaker(uid);
 ```
 
 如果用户开启了 `enableAudioVolumeIndication` 功能，则当音量检测模块监测到频道内有新的活跃用户说话时，会通过本回调返回该用户的 uid。
@@ -2375,7 +2375,7 @@ agoraAudioInst.onActiveSpeaker(uid);
 #### 上下麦回调 (onClientRoleChanged)
 
 ```
-agoraAudioInst.onClientRoleChanged(oldRole, newRole);
+agoraCreatorInst.onClientRoleChanged(oldRole, newRole);
 ```
 
 直播场景下，当用户上下麦时会触发此回调，即主播切换为观众时，或观众切换为主播时。1:主播,2:观众。

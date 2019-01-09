@@ -1,5 +1,5 @@
 
-var agoraAudio_module = {
+var agoraCreator_module = {
 
     AGORAEVT: {
         evt_tips: "msgTips", //< Tips message > 
@@ -43,7 +43,7 @@ var agoraAudio_module = {
 
     roomInput: null,
                           
-    agoraAudioInst: null,
+    agoraCreatorInst: null,
         
     addTips:function(strTips, errcode)
     {
@@ -79,38 +79,38 @@ var agoraAudio_module = {
     
     createEngine:function(appid){
 
-        if(this.agoraAudioInst == null)
+        if(this.agoraCreatorInst == null)
         {
-            cc.log("[js] new agoraAudio()" )
-            this.agoraAudioInst = new agoraAudio();
+            cc.log("[js] new agoraCreator()" )
+            this.agoraCreatorInst = new agoraCreator();
         }
         var self = this;
-        if(this.agoraAudioInst != null)
+        if(this.agoraCreatorInst != null)
         {
-            cc.log("[js] agoraAudioInst.initialize()" )
-            this.agoraAudioInst.initialize(appid)
-            this.agoraAudioInst.onJoinChannelSuccess = function(channel,  uid, elapsed){
+            cc.log("[js] agoraCreatorInst.initialize()" )
+            this.agoraCreatorInst.initialize(appid)
+            this.agoraCreatorInst.onJoinChannelSuccess = function(channel,  uid, elapsed){
                 cc.log("[js] onJoinChannelSuccess, channel:%s,uid :%d, elapsed : %d !", channel, uid, elapsed);    
               
                 self.addTips(" Join Channel Successfully !");
                 self.jSuccessNotify(channel,  uid, elapsed);
             };
 
-            this.agoraAudioInst.onLeaveChannel = function (stats){
+            this.agoraCreatorInst.onLeaveChannel = function (stats){
                 cc.log("[js]onLeaveChannel, stats.duration:%d,stats.txBytes :%d, stats.rxBytes : %d !", stats.duration, stats.txBytes, stats.rxBytes);
                 self.addTips(" Leave Channel Successfully !");
                 self.lSuccessNotify(stats);
             };
 
-            this.agoraAudioInst.onUserMuteAudio = function (userId,  muted){
+            this.agoraCreatorInst.onUserMuteAudio = function (userId,  muted){
                 cc.log("[js]onUserMuteAudio, userId:%d, muted :%d !", userId, muted);
             };
 
-            this.agoraAudioInst.onAudioMixingFinished = function (){
+            this.agoraCreatorInst.onAudioMixingFinished = function (){
                 cc.log("[js]onAudioMixingFinished !");
             };
 
-            this.agoraAudioInst.onAudioVolumeIndication = function (speakers,  speakerNumber, totalVolume){
+            this.agoraCreatorInst.onAudioVolumeIndication = function (speakers,  speakerNumber, totalVolume){
                 cc.log("[js]onAudioVolumeIndication, speakerNumber:%d, totalVolume :%d !", speakerNumber, totalVolume);
                 if (speakerNumber == 0) {
                     cc.log("[js] callback of Remote Speakers"); 
@@ -129,4 +129,4 @@ var agoraAudio_module = {
     },
 }; 
 
-module.exports = agoraAudio_module;
+module.exports = agoraCreator_module;

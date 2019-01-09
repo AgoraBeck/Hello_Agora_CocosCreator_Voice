@@ -1,4 +1,4 @@
-var agoraAudio = require("agoraAudio");
+var agoraCreator = require("agoraCreator");
 
 cc.Class({
     extends: cc.Component,
@@ -91,22 +91,22 @@ cc.Class({
     },
 
     initEvent:function(){              
-        cc.systemEvent.on(agoraAudio.AGORAEVT.evt_tips,this.onEvent,this);
-        cc.systemEvent.on(agoraAudio.AGORAEVT.evt_jSuccess,this.onEvent,this);
-        cc.systemEvent.on(agoraAudio.AGORAEVT.evt_lSuccess,this.onEvent,this);
+        cc.systemEvent.on(agoraCreator.AGORAEVT.evt_tips,this.onEvent,this);
+        cc.systemEvent.on(agoraCreator.AGORAEVT.evt_jSuccess,this.onEvent,this);
+        cc.systemEvent.on(agoraCreator.AGORAEVT.evt_lSuccess,this.onEvent,this);
 
     },
 
     removeEvent:function(){    
-        cc.systemEvent.off(agoraAudio.AGORAEVT.evt_tips,this.onEvent);
-        cc.systemEvent.off(agoraAudio.AGORAEVT.evt_jSuccess,this.onEvent);
-        cc.systemEvent.off(agoraAudio.AGORAEVT.evt_lSuccess,this.onEvent);
+        cc.systemEvent.off(agoraCreator.AGORAEVT.evt_tips,this.onEvent);
+        cc.systemEvent.off(agoraCreator.AGORAEVT.evt_jSuccess,this.onEvent);
+        cc.systemEvent.off(agoraCreator.AGORAEVT.evt_lSuccess,this.onEvent);
     },
 
     onEvent: function(event){
         let eventData = event.data;
         switch (event.type){
-            case agoraAudio.AGORAEVT.evt_tips:
+            case agoraCreator.AGORAEVT.evt_tips:
                 cc.log("Debug: " +  event.data.msg);
                 var s = event.data.msg
                 if(event.data.error != 0){
@@ -115,15 +115,15 @@ cc.Class({
                 this.label.string  = s;
                 break;
 
-            case agoraAudio.AGORAEVT.evt_jSuccess:
-                cc.log("Debug: " + agoraAudio.AGORAEVT.evt_jSuccess);
+            case agoraCreator.AGORAEVT.evt_jSuccess:
+                cc.log("Debug: " + agoraCreator.AGORAEVT.evt_jSuccess);
                 // this.label.string  = s;
                 this.updateUI(true)
 
                 break;
 
-            case agoraAudio.AGORAEVT.evt_lSuccess:
-                cc.log("Debug: " + agoraAudio.AGORAEVT.evt_lSuccess);
+            case agoraCreator.AGORAEVT.evt_lSuccess:
+                cc.log("Debug: " + agoraCreator.AGORAEVT.evt_lSuccess);
                 // this.label.string  = s;     
                 this.updateUI(false)          
 
@@ -138,24 +138,24 @@ cc.Class({
     },
 
     btnCreateClick: function (event, customEventData) {
-        agoraAudio.createEngine("4c51ad802859440cbfb89eb75919d9ed"); // input: APPID
+        agoraCreator.createEngine("Your APP ID"); // input: APPID
         this.label.string = "createEngine called ...";
     },
 
     btnJoinRoomClick: function (event, customEventData) {
-        // agoraAudio.initAgoraAudio("4c51ad802859440cbfb89eb75919d9ed"); // input: APPID
+        // agoraCreator.initagoraCreator("4c51ad802859440cbfb89eb75919d9ed"); // input: APPID
         this.label.string = "join agora Channel...";
         var channelId = this.channelName.string;
 
         if(channelId == ""){
-            agoraAudio.addTips("channelId is null."); 
+            agoraCreator.addTips("channelId is null."); 
             cc.log("channelId is ''");
             return false;
         }else {
             cc.log("channelId: " + channelId);
         }
 
-        //agoraAudio
+        //agoraCreator
         /*!
          *  @param  token   "" or token Value from App Server
          *  @param channelId   Channel name
@@ -166,68 +166,68 @@ cc.Class({
         var token = "";
         var uid = 0;
         var info = "";
-        if(agoraAudio.agoraAudioInst == null){
-            cc.log("agoraAudioInst should be not null.");
+        if(agoraCreator.agoraCreatorInst == null){
+            cc.log("agoraCreatorInst should be not null.");
             return false;
         }else {
-            cc.log("agoraAudioInst is not null.");
+            cc.log("agoraCreatorInst is not null.");
         }
-        agoraAudio.agoraAudioInst.joinChannel(token, channelId, info, uid);
+        agoraCreator.agoraCreatorInst.joinChannel(token, channelId, info, uid);
     },
 
     btnLeaveRoomClick: function (event, customEventData) {
         this.label.string ="LeaveChannel ...";
-        agoraAudio.agoraAudioInst.leaveChannel();
+        agoraCreator.agoraCreatorInst.leaveChannel();
     },  
 
     btnMuteLocalClick: function (event, customEventData) {        
         if(!this.bMuteLocal){
             this.bMuteLocal = !this.bMuteLocal;
-            agoraAudio.addTips("muteLocalAudioStream: " + this.bMuteLocal);                
+            agoraCreator.addTips("muteLocalAudioStream: " + this.bMuteLocal);                
         } else {
             this.bMuteLocal = !this.bMuteLocal; 
-            agoraAudio.addTips("muteLocalAudioStream: " + this.bMuteLocal);            
+            agoraCreator.addTips("muteLocalAudioStream: " + this.bMuteLocal);            
         }
-        agoraAudio.agoraAudioInst.muteLocalAudioStream(this.bMuteLocal);
+        agoraCreator.agoraCreatorInst.muteLocalAudioStream(this.bMuteLocal);
     },
 
     btnMuteRemoteClick: function (event, customEventData) {        
         if(!this.bMuteRemote){
             this.bMuteRemote = !this.bMuteRemote;
-            agoraAudio.addTips("muteAllRemoteAudioStreams: " + this.bMuteRemote);                
+            agoraCreator.addTips("muteAllRemoteAudioStreams: " + this.bMuteRemote);                
         } else {
             this.bMuteRemote = !this.bMuteRemote; 
-            agoraAudio.addTips("muteAllRemoteAudioStreams: " + this.bMuteRemote);            
+            agoraCreator.addTips("muteAllRemoteAudioStreams: " + this.bMuteRemote);            
         }
-        agoraAudio.agoraAudioInst.muteAllRemoteAudioStreams(this.bMuteRemote);
+        agoraCreator.agoraCreatorInst.muteAllRemoteAudioStreams(this.bMuteRemote);
     },
 
     btnSetSpeakerPhoneClick: function (event, customEventData) {
         if(!this.bMuteRemote){
             this.bMuteRemote = !this.bMuteRemote;
-            agoraAudio.addTips("setEnableSpeakerphone: " + this.bMuteRemote);                
+            agoraCreator.addTips("setEnableSpeakerphone: " + this.bMuteRemote);                
         } else {
             this.bMuteRemote = !this.bMuteRemote;
-            agoraAudio.addTips("setEnableSpeakerphone: " + this.bMuteRemote);            
+            agoraCreator.addTips("setEnableSpeakerphone: " + this.bMuteRemote);            
         }
-        agoraAudio.agoraAudioInst.setEnableSpeakerphone(this.bMuteRemote);
+        agoraCreator.agoraCreatorInst.setEnableSpeakerphone(this.bMuteRemote);
     },
 
     btnEnableAudioClick: function (event, customEventData) {
-        agoraAudio.agoraAudioInst.enableAudio();
-        agoraAudio.addTips("enable Audio "); 
+        agoraCreator.agoraCreatorInst.enableAudio();
+        agoraCreator.addTips("enable Audio "); 
     },
 
     btnDisableAudioClick: function (event, customEventData) {
-        agoraAudio.agoraAudioInst.disableAudio();
-        agoraAudio.addTips("disable Audio "); 
+        agoraCreator.agoraCreatorInst.disableAudio();
+        agoraCreator.addTips("disable Audio "); 
     },
 
     btnStartAudioMixClick: function (event, customEventData) {
-        agoraAudio.agoraAudioInst.startAudioMixing("https://mms.msstatic.com/music/PczYBajT2B.mp3", false,false, 1);
+        agoraCreator.agoraCreatorInst.startAudioMixing("https://mms.msstatic.com/music/PczYBajT2B.mp3", false,false, 1);
     },
 
     btnStopAudioMixClick: function (event, customEventData) {
-        agoraAudio.agoraAudioInst.stopAudioMixing();
+        agoraCreator.agoraCreatorInst.stopAudioMixing();
     },
 });

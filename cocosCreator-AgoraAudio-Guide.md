@@ -1,7 +1,20 @@
 # cocosCreator 集成使用指南
 
 
-## 1.cocoscreator 编译:
+## 1.cocoscreator Demo 编译:
+*  创建 Agora 账号并获取 App ID
+	1. 进入 ![https://dashboard.agora.io/](https://dashboard.agora.io/) ，按照屏幕提示创建一个开发者账号。
+	
+	2. 登录 Dashboard 页面，点击添加新项目。
+
+	3. 填写项目名， 然后点击提交 。
+
+	4. 在你创建的项目下，查看并获取该项目对应的App ID。
+	
+* 添加 App ID。
+
+	![](png/inputAppId.png)
+	
 
 * 编译配置
 
@@ -19,7 +32,9 @@
 
 	分别"Build" -> “Compile”，Android， iOS平台的demo。
 	
-	再对AgoraAudioSDK的插件在Android、iOS上进行分别导入、配置，编译。
+	再对agoraCreatorSDK的插件在Android、iOS上进行分别导入、配置，编译。
+
+
 
 ## 2.开发环境集成
 
@@ -28,18 +43,18 @@ Cocos2d-js开发环境生成的目录结构如下图所示.
 ![](png/struct.png)
 
 
-AgoraAuidoSDK（“libs”文件夹以及JSB封装c++ 文件），这个目录下包含了Android和iOS两个平台所需的所有C++头文件和库文件。
+agoraCreatorSDK（“libs”文件夹以及JSB封装c++ 文件），这个目录下包含了Android和iOS两个平台所需的所有C++头文件和库文件。
 
 
 | 文件 |描述 | 
 | ------ | ------ | 
-| jsb_agoraAudio.cpp |  C++ API JSB 封装 | 
-| jsb_agoraAudio.h   |  C++ APIJSB 封装头文件 | 
+| jsb_agoraCreator.cpp |  C++ API JSB 封装 | 
+| jsb_agoraCreator.h   |  C++ APIJSB 封装头文件 | 
 | iOS 目录   | [互动游戏 SDK:iOS 语音版V2.2](https://docs.agora.io/cn/Agora%20Platform/downloads)，并按照如图放置| 
 | Android目录   |[互动游戏 SDK:Android 语音版V2.2](https://docs.agora.io/cn/Agora%20Platform/downloads)，并按照如图放置| 
 
 
-![](png/AgoraAudioSDK.png)
+![](png/agoraCreatorSDK.png)
 
 cocoscreator Demo，构建、编译后，将AgoraAuidoSDK目录复制到： 
 
@@ -56,7 +71,7 @@ runtime-src/ 下会有不同平台的工程。
 
 ### 修改proj.android-studio/jni/Android.mk
 
-对应位置增加指定内容，分别对Agora实时语音SDK的动态库进行预编译处理、添加头文件路径、链接动态库。
+对应位置增加指定内容，分别对Agora实时语音SDK的agoraCreator动态库进行预编译处理、添加头文件路径、链接动态库。
 
 
 ```
@@ -68,7 +83,7 @@ include $(CLEAR_VARS)
 #＝＝＝＝＝＝Agora Add 1，start. ＝＝＝＝＝＝＝＝＝#
 include $(CLEAR_VARS)
 LOCAL_MODULE := agora-rtc
-LOCAL_SRC_FILES := ../../../AgoraAuidoSDK/libs/Android/$(TARGET_ARCH_ABI)/libagora-rtc-sdk-jni.so
+LOCAL_SRC_FILES := ../../../agoraCreatorSDK/libs/Android/$(TARGET_ARCH_ABI)/libagora-rtc-sdk-jni.so
 include $(PREBUILT_SHARED_LIBRARY)
 #＝＝＝＝＝＝Agora Add 1，end. ＝＝＝＝＝＝＝＝＝#
 
@@ -85,14 +100,14 @@ LOCAL_SRC_FILES := hellojavascript/main.cpp \
 				   ../../../Classes/jsb_module_register.cpp
 
 #＝＝＝＝＝＝Agora Add 2，start. ＝＝＝＝＝＝＝＝＝#
-LOCAL_SRC_FILES += $(LOCAL_PATH)/../../../AgoraAuidoSDK/jsb_agoraAudio.cpp
+LOCAL_SRC_FILES += $(LOCAL_PATH)/../../../agoraCreatorSDK/jsb_agoraCreator.cpp
 #＝＝＝＝＝＝Agora Add 2，end. ＝＝＝＝＝＝＝＝＝#
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../../Classes
 
 #＝＝＝＝＝＝Agora Add 3，start. ＝＝＝＝＝＝＝＝＝#
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/../../../AgoraAuidoSDK/libs/Android/include  \
-                    $(LOCAL_PATH)/../../../AgoraAuidoSDK
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/../../../agoraCreatorSDK/libs/Android/include  \
+                    $(LOCAL_PATH)/../../../agoraCreatorSDK
 
 #＝＝＝＝＝＝Agora Add 3，end. ＝＝＝＝＝＝＝＝＝#
 
@@ -114,9 +129,9 @@ endif
 LOCAL_STATIC_LIBRARIES := cocos2dx_static
 
 
-#＝＝＝＝＝＝Agora Add 3，start. ＝＝＝＝＝＝＝＝＝#
+#＝＝＝＝＝＝Agora Add 4，start. ＝＝＝＝＝＝＝＝＝#
 LOCAL_SHARED_LIBRARIES := agora-rtc
-#＝＝＝＝＝＝Agora Add 3，end. ＝＝＝＝＝＝＝＝＝#
+#＝＝＝＝＝＝Agora Add 4，end. ＝＝＝＝＝＝＝＝＝#
 
 
 LOCAL_EXPORT_CFLAGS := -DCOCOS2D_DEBUG=2
@@ -126,6 +141,27 @@ include $(BUILD_SHARED_LIBRARY)
 
 $(call import-module, cocos)
 
+
+```
+
+### 指定需要兼容的架构
+
+修改app/build.graddle 
+
+```
+//set so supported. Dependent on your requirements.
+ndk {
+	abiFilters 'armeabi-v7a'// 'armeabi-v7a', 'arm64-v8a', 'x86'
+}
+```
+
+修改proj.android-studio/jni/Application.mk
+
+```
+# Uncomment this line to compile to armeabi-v7a, your application will run faster but support less devices
+
+APP_ABI := armeabi-v7a
+#APP_ABI := 'armeabi-v7a', 'arm64-v8a', 'x86'
 
 ```
 
@@ -143,15 +179,7 @@ $(call import-module, cocos)
 
 
 
-### 修改build.graddle <可选>
-
-```
-//set so supported. Dependent on your requirements.
-ndk {
-	abiFilters 'armeabi-v7a'// 'armeabi-v7a', 'arm64-v8a', 'x86''
-}
-```
-
+### app/build.gradle 更新
 
 ```
 
@@ -159,7 +187,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar','*.aar'])
     implementation fileTree(dir: "/Applications/CocosCreator.app/Contents/Resources/cocos2d-x/cocos/platform/android/java/libs", include: ['*.jar'])
     //Agora add,start.
-    implementation fileTree(dir: '../../AgoraAuidoSDK/libs/Android/', include: ['*.jar'])
+    implementation fileTree(dir: '../../agoraCreatorSDK/libs/Android/', include: ['*.jar'])
     //Agora add,end.
     implementation project(':libcocos2dx')
 }
@@ -170,11 +198,11 @@ dependencies {
 
 打开Classes/AppDelegate.cpp
 
-* 引入C++接口文件 #include "../AgoraAuidoSDK/jsb_agoraAudio.h"
+* 引入C++接口文件 #include "../agoraCreatorSDK/jsb_agoraCreator.h"
 * 注册js方法：在AppDelegate::applicationDidFinishLaunching() 中，添加注册函数。
 
 ```
-    se->addRegisterCallback(register_jsb_agoraAudio);
+    se->addRegisterCallback(register_jsb_agoraCreator);
     se->start();
 ```
 
@@ -199,46 +227,51 @@ public class AppActivity extends Cocos2dxActivity {
 
 1.打开到Demo Xcode工程，将AgoraAuidoSDK中的：
 
->jsb_agoraAudio.h
+>jsb_agoraCreator.h
 > 
->jsb_agoraAudio.cpp
+>jsb_agoraCreator.cpp
 
 拖动到Xcode工程下的'Classses'目录下。
 
 
-2.将AgoraAuidoSDK/libs/iOS下的 AgoraAudioKit.framework，拖动到Xcode里的Frameworks下。
+2.将agoraCreatorSDK/libs/iOS下的 AgoraAudioKit.framework，拖动到Xcode里的Frameworks下。
 
 
-### Framework 
+### Agora Framework导入 
 
 Build Settings -> Search Paths -> Framework Search Paths中添加:
 
-> $(SRCROOT)/../AgoraAuidoSDK/libs/iOS
+> $(SRCROOT)/../agoraCreatorSDK/libs/iOS
+
 建议直接将此ios文件夹拖到xcode需要填入的位置，然后路径会自动生成
 
 添加头文件路径：在Build Settings -> Search Paths -> Header Search Paths中添加: 
-> $(SRCROOT)/../AgoraAuidoSDK 
+> $(SRCROOT)/../agoraCreatorSDK 
 
-建议直接将此AgoraAuidoSDK文件夹拖到xcode需要填入的位置，然后路径会自动生成.
+建议直接将此agoraCreatorSDK文件夹拖到xcode需要填入的位置，然后路径会自动生成.
 
 
-### 依赖库导入
+### 系统Framework依赖
 
 在Build Phases -> Link Binary With Libraries下添加：
 
 	libresolv.9.tbd
 	coreMedia.framework
-
+	SystemConfiguration.framework
+	CFNetwork.framework
+	VideoToolbox.framework
+	coreMedia.framework
+	CoreTelephony.framework
 
 ### 接口注册
 
 打开Classes/AppDelegate.cpp
 
-* 引入C++接口文件 #include "../AgoraAuidoSDK/jsb_agoraAudio.h"
+* 引入C++接口文件 #include "../agoraCreatorSDK/jsb_agoraCreator.h"
 * 注册js方法：在AppDelegate::applicationDidFinishLaunching() 中，添加注册函数。
 
 ```
-    se->addRegisterCallback(register_jsb_agoraAudio);
+    se->addRegisterCallback(register_jsb_agoraCreator);
     se->start();
 ```
 
