@@ -2488,6 +2488,32 @@ static bool js_cocos2dx_extension_agoraCreator_setEnableSpeakerphone(se::State& 
 }
 SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setEnableSpeakerphone)
 
+static bool js_cocos2dx_extension_agoraCreator_setParameters(se::State& s) {
+    CCLOG("setParameters() !!!");
+    IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_extension_agoraCreator_setParameters: Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1)
+    {
+        std::string sStr;
+        ok &= seval_to_std_string(args[0], &sStr);
+    
+        agora::base::AParameter apm(cobj);
+        int  ret = apm->setParameters(sStr.c_str());
+
+        int32_to_seval(ret, &s.rval());
+        
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_extension_agoraCreator_setParameters : Error processing arguments");
+        return true;
+    }
+    
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    return false;
+}
+SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setParameters)
+
 
 static bool js_agoraCreator_finalize(se::State& s){
     CCLOGINFO("jsbindings: finalizing JS object %p (agoraCreator)", s.nativeThisObject());
@@ -2601,6 +2627,8 @@ bool js_register_cocos2dx_extension_agoraCreator(se::Object* obj)
     cls->defineFunction("muteRemoteAudioStream", _SE(js_cocos2dx_extension_agoraCreator_muteRemoteAudioStream));
     cls->defineFunction("setDefaultAudioRouteToSpeakerphone", _SE(js_cocos2dx_extension_agoraCreator_setDefaultAudioRouteToSpeakerphone));
     cls->defineFunction("setEnableSpeakerphone", _SE(js_cocos2dx_extension_agoraCreator_setEnableSpeakerphone));
+    
+    cls->defineFunction("setParameters", _SE(js_cocos2dx_extension_agoraCreator_setParameters));
 
     cls->defineFinalizeFunction(_SE(js_agoraCreator_finalize));
     cls->install();
