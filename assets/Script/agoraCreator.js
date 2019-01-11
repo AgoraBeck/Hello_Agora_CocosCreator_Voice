@@ -1,8 +1,8 @@
 
 var agoraCreator_module = {
-
     AGORAEVT: {
         evt_tips: "msgTips", //< Tips message > 
+        evt_created: "msgCreated",
         evt_jSuccess:"joinSuccess",       
         evt_lSuccess:"leaveSuccess",     
  
@@ -57,6 +57,17 @@ var agoraCreator_module = {
         cc.systemEvent.dispatchEvent(event);
     },
 
+    createdNotify:function(){
+        var err = errcode != undefined? errcode: 0;
+        let event = new cc.Event(this.AGORAEVT.evt_created, true);
+        // var p = {
+        //     msg: strTips,
+        //     error: err,
+        // };
+        // event["data"] = p;
+        cc.systemEvent.dispatchEvent(event);
+    },
+
     jSuccessNotify:function(channel, uid, elapsed)
     {
         var event = new cc.Event(this.AGORAEVT.evt_jSuccess, true);
@@ -88,7 +99,10 @@ var agoraCreator_module = {
         if(this.agoraCreatorInst != null)
         {
             cc.log("[js] agoraCreatorInst.initialize()" )
-            this.agoraCreatorInst.initialize(appid)
+            if(this.agoraCreatorInst.initialize(appid)){
+                this.createdNotify();
+            }
+
             this.agoraCreatorInst.onJoinChannelSuccess = function(channel,  uid, elapsed){
                 cc.log("[js] onJoinChannelSuccess, channel:%s,uid :%d, elapsed : %d !", channel, uid, elapsed);    
               
@@ -127,6 +141,14 @@ var agoraCreator_module = {
             };
         }
     },
+
+    // destoryEngine:function(){
+    //     if(this.agoraCreatorInst != null)
+    //     {
+    //         this.agoraCreatorInst.destoryEngine(); 
+    //     }
+    // },
+
 }; 
 
 module.exports = agoraCreator_module;

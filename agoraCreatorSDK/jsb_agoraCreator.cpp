@@ -2517,16 +2517,25 @@ SE_BIND_FUNC(js_cocos2dx_extension_agoraCreator_setParameters)
 
 static bool js_agoraCreator_finalize(se::State& s){
     CCLOGINFO("jsbindings: finalizing JS object %p (agoraCreator)", s.nativeThisObject());
-    auto iter = se::NonRefNativePtrCreatedByCtorMap::find(s.nativeThisObject());
-    if (iter != se::NonRefNativePtrCreatedByCtorMap::end())
-    {
-        se::NonRefNativePtrCreatedByCtorMap::erase(iter);
-         IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
-        //delete cobj;
-		if(cobj){
-			cobj->release();
-        }
+//    auto iter = se::NonRefNativePtrCreatedByCtorMap::find(s.nativeThisObject());
+//    if (iter != se::NonRefNativePtrCreatedByCtorMap::end())
+//    {
+//        se::NonRefNativePtrCreatedByCtorMap::erase(iter);
+//         IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
+//        //delete cobj;
+//        if(cobj){
+//            cobj->release();
+//        }
+//    }
+    IRtcEngine* cobj = (IRtcEngine*)s.nativeThisObject();
+    if(cobj){
+        cobj->release();
     }
+    
+   if(g_SingleInstance){
+        delete g_SingleInstance;
+        g_SingleInstance = NULL;
+    } 
     return true;
 }
 SE_BIND_FINALIZE_FUNC(js_agoraCreator_finalize)

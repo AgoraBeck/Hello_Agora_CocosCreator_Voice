@@ -172,6 +172,8 @@ cc.Class({
         }else {
             cc.log("agoraCreatorInst is not null.");
         }
+        agoraCreator.agoraCreatorInst.setDefaultAudioRouteToSpeakerphone(true);
+
         agoraCreator.agoraCreatorInst.joinChannel(token, channelId, info, uid);
     },
 

@@ -24,6 +24,11 @@ cc.Class({
             type: cc.Button
         },
 
+        btnDestory: {
+            default: null,
+            type: cc.Button
+        },
+
         btnJoin: {
             default: null,
             type: cc.Button
@@ -70,6 +75,7 @@ cc.Class({
         this.label.string = this.text;
 
         this.updateUI(false);
+        console.log("Page loaded ");
     },
     onDestroy () {
         this.removeEvent();
@@ -91,15 +97,15 @@ cc.Class({
     },
 
     initEvent:function(){              
-        cc.systemEvent.on(agoraCreator.AGORAEVT.evt_tips,this.onEvent,this);
-        cc.systemEvent.on(agoraCreator.AGORAEVT.evt_jSuccess,this.onEvent,this);
+        // cc.systemEvent.on(agoraCreator.AGORAEVT.evt_tips,this.onEvent,this);
+        // cc.systemEvent.on(agoraCreator.AGORAEVT.evt_jSuccess,this.onEvent,this);
         cc.systemEvent.on(agoraCreator.AGORAEVT.evt_lSuccess,this.onEvent,this);
 
     },
 
     removeEvent:function(){    
-        cc.systemEvent.off(agoraCreator.AGORAEVT.evt_tips,this.onEvent);
-        cc.systemEvent.off(agoraCreator.AGORAEVT.evt_jSuccess,this.onEvent);
+        // cc.systemEvent.off(agoraCreator.AGORAEVT.evt_tips,this.onEvent);
+        // cc.systemEvent.off(agoraCreator.AGORAEVT.evt_jSuccess,this.onEvent);
         cc.systemEvent.off(agoraCreator.AGORAEVT.evt_lSuccess,this.onEvent);
     },
 
@@ -132,18 +138,19 @@ cc.Class({
         }
     },
 
-    // called every frame
-    update: function (dt) {
-
-    },
-
     btnCreateClick: function (event, customEventData) {
-        agoraCreator.createEngine("Your APP ID"); // input: APPID
+        agoraCreator.createEngine("4c51ad802859440cbfb89eb75919d9ed"); // input: APPID
         this.label.string = "createEngine called ...";
     },
 
+    btnDestoryClick: function (event, customEventData) {
+        agoraCreator.val = 1;
+        cc.director.loadScene("Scene1");
+        this.label.string = "destoryEngine called ...";
+    },
+
+
     btnJoinRoomClick: function (event, customEventData) {
-        // agoraCreator.initagoraCreator("4c51ad802859440cbfb89eb75919d9ed"); // input: APPID
         this.label.string = "join agora Channel...";
         var channelId = this.channelName.string;
 
@@ -172,6 +179,8 @@ cc.Class({
         }else {
             cc.log("agoraCreatorInst is not null.");
         }
+        agoraCreator.agoraCreatorInst.setDefaultAudioRouteToSpeakerphone(true);
+
         agoraCreator.agoraCreatorInst.joinChannel(token, channelId, info, uid);
     },
 

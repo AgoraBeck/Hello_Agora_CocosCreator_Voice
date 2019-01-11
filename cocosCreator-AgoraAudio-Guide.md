@@ -56,7 +56,7 @@ agoraCreatorSDK（“libs”文件夹以及JSB封装c++ 文件），这个目录
 
 ![](png/agoraCreatorSDK.png)
 
-cocoscreator Demo，构建、编译后，将AgoraAuidoSDK目录复制到： 
+cocoscreator Demo，构建、编译后，***将agoraCreator目录复制到以下目录***： 
 
 > build/jsb-link/frameworks/runtime-src/
 > 
@@ -65,9 +65,11 @@ cocoscreator Demo，构建、编译后，将AgoraAuidoSDK目录复制到：
 > build/jsb-default/frameworks/runtime-src/
 
 
-runtime-src/ 下会有不同平台的工程。
+注解： runtime-src/ 下会有不同平台的工程。
 
 ## 3.Android Studio开发环境配置
+
+打开项目目录里 frameworks/runtime-src/proj.android-studio/下的，Android工程。 
 
 ### 修改proj.android-studio/jni/Android.mk
 
@@ -146,20 +148,27 @@ $(call import-module, cocos)
 
 ### 指定需要兼容的架构
 
-修改app/build.graddle 
+修改app/build.graddle, 配置abiFilters.
 
 ```
-//set so supported. Dependent on your requirements.
-ndk {
-	abiFilters 'armeabi-v7a'// 'armeabi-v7a', 'arm64-v8a', 'x86'
-}
+  defaultConfig {
+  	applicationId "org.cocos2d.Hello_Agora_CocosCreator"
+	minSdkVersion PROP_MIN_SDK_VERSION
+	targetSdkVersion PROP_TARGET_SDK_VERSION
+	versionCode 1
+  	versionName "1.0"
+
+   	// set so supported. Dependent on your requirements.
+   	ndk {
+   		abiFilters  'armeabi-v7a' //, 'arm64-v8a', 'x86'
+   }
+ 
 ```
 
 修改proj.android-studio/jni/Application.mk
 
 ```
 # Uncomment this line to compile to armeabi-v7a, your application will run faster but support less devices
-
 APP_ABI := armeabi-v7a
 #APP_ABI := 'armeabi-v7a', 'arm64-v8a', 'x86'
 
@@ -176,7 +185,6 @@ APP_ABI := armeabi-v7a
 <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 <uses-permission android:name="android.permission.BLUETOOTH" />
 ```
-
 
 
 ### app/build.gradle 更新
@@ -198,11 +206,30 @@ dependencies {
 
 打开Classes/AppDelegate.cpp
 
-* 引入C++接口文件 #include "../agoraCreatorSDK/jsb_agoraCreator.h"
-* 注册js方法：在AppDelegate::applicationDidFinishLaunching() 中，添加注册函数。
+* 引入C++接口文件 #include "../agoraCreatorSDK/jsb_agoraCreator.h", 如下： 
 
 ```
+#endif
+
+#include "../agoraCreatorSDK/jsb_agoraCreator.h"
+
+USING_NS_CC;
+
+AppDelegate::AppDelegate(int width, int height) : Application("Cocos Game", width, height)
+{
+}
+
+```
+* 注册js方法：在AppDelegate::applicationDidFinishLaunching() 中，添加注册函数: 
+ 	se->addRegisterCallback(register_jsb_agoraCreator);
+
+```
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS) && PACKAGE_ASx
+   se->addRegisterCallback(register_all_anysdk_framework);
+   se->addRegisterCallback(register_all_anysdk_manual);
+#endif
     se->addRegisterCallback(register_jsb_agoraCreator);
+
     se->start();
 ```
 
@@ -218,6 +245,9 @@ public class AppActivity extends Cocos2dxActivity {
 
 ```
 
+### 运行Android 工程
+
+运行项目目录里 frameworks/runtime-src/proj.android-studio/下的，Android工程。
 
 
 ## 4. iOS集成
@@ -256,7 +286,6 @@ Build Settings -> Search Paths -> Framework Search Paths中添加:
 在Build Phases -> Link Binary With Libraries下添加：
 
 	libresolv.9.tbd
-	coreMedia.framework
 	SystemConfiguration.framework
 	CFNetwork.framework
 	VideoToolbox.framework
@@ -267,20 +296,48 @@ Build Settings -> Search Paths -> Framework Search Paths中添加:
 
 打开Classes/AppDelegate.cpp
 
-* 引入C++接口文件 #include "../agoraCreatorSDK/jsb_agoraCreator.h"
-* 注册js方法：在AppDelegate::applicationDidFinishLaunching() 中，添加注册函数。
+* 引入C++接口文件 #include "../agoraCreatorSDK/jsb_agoraCreator.h", 如下： 
 
 ```
+#endif
+
+#include "../agoraCreatorSDK/jsb_agoraCreator.h"
+
+USING_NS_CC;
+
+AppDelegate::AppDelegate(int width, int height) : Application("Cocos Game", width, height)
+{
+}
+
+```
+* 注册js方法：在AppDelegate::applicationDidFinishLaunching() 中，添加注册函数: 
+ 	se->addRegisterCallback(register_jsb_agoraCreator);
+
+```
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS) && PACKAGE_ASx
+   se->addRegisterCallback(register_all_anysdk_framework);
+   se->addRegisterCallback(register_all_anysdk_manual);
+#endif
     se->addRegisterCallback(register_jsb_agoraCreator);
+
     se->start();
 ```
 
+
 ### 添加录音权限
+
+
 
 为iOS10以上版本添加录音权限配置 ：首次录音时会向用户申请权限。
 
+打开frameworks/runtime-src/proj.ios_mac/下的ios工程.
+
 选择TARGETS里的info，在Custom iOS Target Properties下新加一个key。选择Privacy-Microphone Usage Description，Value为字符串(授权弹窗出现时提示给用户)。
 
+
+### 运行iOS工程
+
+直接运行项目目录里，frameworks/runtime-src/proj.ios_mac/下的，ios工程。 
 
 
 	
