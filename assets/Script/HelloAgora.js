@@ -59,11 +59,23 @@ cc.Class({
             type: cc.Button
         },
 
+        recordSlider:{
+            default: null,
+            type: cc.Slider 
+        },
+
+        playbackSlider:{
+            default: null,
+            type: cc.Slider
+        },
+
         //defaults, set visually when attaching this script to the Canvas
         text: 'Hello Agora Audio !',
 
         bMuteLocal:false,
         bMuteRemote:false,
+        bLocalAudio:true,
+        bSpeakerPhone:false,
 
     },
 
@@ -74,7 +86,7 @@ cc.Class({
 
         this.label.string = this.text;
 
-        this.updateUI(false);
+        // this.updateUI(false);
         console.log("Page loaded ");
     },
     onDestroy () {
@@ -97,14 +109,14 @@ cc.Class({
     },
 
     initEvent:function(){              
-        // cc.systemEvent.on(agoraCreator.AGORAEVT.evt_tips,this.onEvent,this);
+        cc.systemEvent.on(agoraCreator.AGORAEVT.evt_tips,this.onEvent,this);
         // cc.systemEvent.on(agoraCreator.AGORAEVT.evt_jSuccess,this.onEvent,this);
         cc.systemEvent.on(agoraCreator.AGORAEVT.evt_lSuccess,this.onEvent,this);
 
     },
 
     removeEvent:function(){    
-        // cc.systemEvent.off(agoraCreator.AGORAEVT.evt_tips,this.onEvent);
+        cc.systemEvent.off(agoraCreator.AGORAEVT.evt_tips,this.onEvent);
         // cc.systemEvent.off(agoraCreator.AGORAEVT.evt_jSuccess,this.onEvent);
         cc.systemEvent.off(agoraCreator.AGORAEVT.evt_lSuccess,this.onEvent);
     },
@@ -124,64 +136,71 @@ cc.Class({
             case agoraCreator.AGORAEVT.evt_jSuccess:
                 cc.log("Debug: " + agoraCreator.AGORAEVT.evt_jSuccess);
                 // this.label.string  = s;
-                this.updateUI(true)
-
+                // this.updateUI(true)
                 break;
 
             case agoraCreator.AGORAEVT.evt_lSuccess:
                 cc.log("Debug: " + agoraCreator.AGORAEVT.evt_lSuccess);
                 // this.label.string  = s;     
-                this.updateUI(false)          
-
+                // this.updateUI(false)          
+                cc.director.loadScene("scene1");
                 break;
-
         }
     },
 
-    btnCreateClick: function (event, customEventData) {
-        agoraCreator.createEngine("4c51ad802859440cbfb89eb75919d9ed"); // input: APPID
-        this.label.string = "createEngine called ...";
+    adjustPlaybackSignalVolume:function (event, customEventData) {
+        agoraCreator.agoraCreatorInst.adjustPlaybackSignalVolume(this.intRound(this.playbackSlider.progress));
+        agoraCreator.addTips("adjustPlaybackSignalVolume: " + this.intRound(this.playbackSlider.progress));
+    },
+
+    adjustRecordingSignalVolume:function (event, customEventData) {
+        agoraCreator.agoraCreatorInst.adjustRecordingSignalVolume(this.intRound(this.recordSlider.progress));
+        agoraCreator.addTips("adjustRecordingSignalVolume: " + this.intRound(this.recordSlider.progress));
+    },
+
+    intRound:function(val){
+        var val1 = Math.round(val*100)*4;  
+        return val1;
+    },
+
+    enableLocalAudio:function (event, customEventData) {
+        if(!this.bLocalAudio){
+            this.bLocalAudio = !this.bLocalAudio;
+            agoraCreator.addTips("enableLocalAudio: " + this.bLocalAudio);                
+        } else {
+            this.bLocalAudio = !this.bLocalAudio; 
+            agoraCreator.addTips("enableLocalAudio: " + this.bLocalAudio);            
+        }
+        agoraCreator.agoraCreatorInst.enableLocalAudio(this.bLocalAudio);
+        agoraCreator.addTips("enableLocalAudio: " + this.bLocalAudio);
     },
 
     btnDestoryClick: function (event, customEventData) {
-        agoraCreator.val = 1;
-        cc.director.loadScene("Scene1");
-        this.label.string = "destoryEngine called ...";
+         agoraCreator.agoraCreatorInst.leaveChannel();
+         this.label.string = "destoryEngine called ...";
+         cc.director.loadScene("scene1");
     },
 
-
-    btnJoinRoomClick: function (event, customEventData) {
-        this.label.string = "join agora Channel...";
-        var channelId = this.channelName.string;
-
-        if(channelId == ""){
-            agoraCreator.addTips("channelId is null."); 
-            cc.log("channelId is ''");
-            return false;
-        }else {
-            cc.log("channelId: " + channelId);
+    setEnableSpeakerphone: function (event, customEventData) {
+        if(!this.bSpeakerPhone){
+            this.bSpeakerPhone = !this.bSpeakerPhone;
+            agoraCreator.addTips("enableLocalAudio: " + this.bSpeakerPhone);                
+        } else {
+            this.bSpeakerPhone = !this.bSpeakerPhone; 
+            agoraCreator.addTips("enableLocalAudio: " + this.bSpeakerPhone);            
         }
+        agoraCreator.agoraCreatorInst.setEnableSpeakerphone(this.bSpeakerPhone);
+    },
 
-        //agoraCreator
-        /*!
-         *  @param  token   "" or token Value from App Server
-         *  @param channelId   Channel name
-         *  @param uid  user id, 0:SDK will generate it,or uid of app player's id
-         *  @param  info   ""
-         *  @return errCode
-         */
-        var token = "";
-        var uid = 0;
-        var info = "";
-        if(agoraCreator.agoraCreatorInst == null){
-            cc.log("agoraCreatorInst should be not null.");
-            return false;
-        }else {
-            cc.log("agoraCreatorInst is not null.");
+    setEnableSpeakerphone: function (event, customEventData) {
+        if(!this.bSpeakerPhone){
+            this.bSpeakerPhone = !this.bSpeakerPhone;
+            agoraCreator.addTips("enableLocalAudio: " + this.bSpeakerPhone);                
+        } else {
+            this.bSpeakerPhone = !this.bSpeakerPhone; 
+            agoraCreator.addTips("enableLocalAudio: " + this.bSpeakerPhone);            
         }
-        agoraCreator.agoraCreatorInst.setDefaultAudioRouteToSpeakerphone(true);
-
-        agoraCreator.agoraCreatorInst.joinChannel(token, channelId, info, uid);
+        agoraCreator.agoraCreatorInst.setEnableSpeakerphone(this.bSpeakerPhone);
     },
 
     btnLeaveRoomClick: function (event, customEventData) {
@@ -209,17 +228,6 @@ cc.Class({
             agoraCreator.addTips("muteAllRemoteAudioStreams: " + this.bMuteRemote);            
         }
         agoraCreator.agoraCreatorInst.muteAllRemoteAudioStreams(this.bMuteRemote);
-    },
-
-    btnSetSpeakerPhoneClick: function (event, customEventData) {
-        if(!this.bMuteRemote){
-            this.bMuteRemote = !this.bMuteRemote;
-            agoraCreator.addTips("setEnableSpeakerphone: " + this.bMuteRemote);                
-        } else {
-            this.bMuteRemote = !this.bMuteRemote;
-            agoraCreator.addTips("setEnableSpeakerphone: " + this.bMuteRemote);            
-        }
-        agoraCreator.agoraCreatorInst.setEnableSpeakerphone(this.bMuteRemote);
     },
 
     btnEnableAudioClick: function (event, customEventData) {

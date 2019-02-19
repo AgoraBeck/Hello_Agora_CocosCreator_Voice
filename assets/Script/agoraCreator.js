@@ -57,14 +57,13 @@ var agoraCreator_module = {
         cc.systemEvent.dispatchEvent(event);
     },
 
-    createdNotify:function(){
+    createdNotify:function(errcode){
         var err = errcode != undefined? errcode: 0;
         let event = new cc.Event(this.AGORAEVT.evt_created, true);
-        // var p = {
-        //     msg: strTips,
-        //     error: err,
-        // };
-        // event["data"] = p;
+        var p = {
+            error: err,
+        };
+        event["data"] = p;
         cc.systemEvent.dispatchEvent(event);
     },
 
@@ -98,10 +97,13 @@ var agoraCreator_module = {
         var self = this;
         if(this.agoraCreatorInst != null)
         {
-            cc.log("[js] agoraCreatorInst.initialize()" )
-            if(this.agoraCreatorInst.initialize(appid)){
-                this.createdNotify();
+            
+            var err = this.agoraCreatorInst.initialize(appid) 
+            if(err){
+                cc.log("[js] agoraCreatorInst.initialize() fail " )
+                return;
             }
+            self.createdNotify(err);
 
             this.agoraCreatorInst.onJoinChannelSuccess = function(channel,  uid, elapsed){
                 cc.log("[js] onJoinChannelSuccess, channel:%s,uid :%d, elapsed : %d !", channel, uid, elapsed);    
