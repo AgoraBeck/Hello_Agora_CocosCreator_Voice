@@ -1,4 +1,3 @@
-var agoraCreator = require("agoraCreator");
 
 cc.Class({
     extends: cc.Component,
@@ -63,17 +62,15 @@ cc.Class({
         profileRole:0,
 
         bDefaultSpeakerphone:false,
-
     },
 
-    // use this for initialization
     onLoad: function () {        
         this.updateUI(false);
-        this.initEvent();
+        agora.on('join-channel-success',this.onJoinChannelSuccess, this);
     },
 
     onDestroy () {
-        this.removeEvent();
+        agora.off('join-channel-success',this.onJoinChannelSuccess);
         console.log("Page Destory");
     },
 
@@ -87,87 +84,61 @@ cc.Class({
         this.toggle3.interactable = bInited;
     },
 
-    initEvent:function(){              
-        cc.systemEvent.on(agoraCreator.AGORAEVT.evt_tips,this.onEvent,this);
-        cc.systemEvent.on(agoraCreator.AGORAEVT.evt_created,this.onEvent,this);
-        cc.systemEvent.on(agoraCreator.AGORAEVT.evt_jSuccess,this.onEvent,this);
-    },
-
-    removeEvent:function(){    
-        cc.systemEvent.off(agoraCreator.AGORAEVT.evt_tips,this.onEvent);
-        cc.systemEvent.off(agoraCreator.AGORAEVT.evt_created,this.onEvent);
-        cc.systemEvent.off(agoraCreator.AGORAEVT.evt_jSuccess,this.onEvent);
-    },
-
-    onEvent: function(event){
-        let eventData = event.data;
-        switch (event.type){
-            case agoraCreator.AGORAEVT.evt_tips:
-                cc.log("Debug: " +  event.data.msg);
-                var s = event.data.msg
-                if(event.data.error != 0){
-                    s += "[errorcode]" + obj.error;
-                }
-                this.msgLabel.string  = s;
-                break;
-
-            case agoraCreator.AGORAEVT.evt_created:
-                this.msgLabel.string = "createEngine called ...";
-                this.sdkVer.string =  "sdkVer: " + agoraCreator.agoraCreatorInst.getVersion();
-                this.updateUI(true);
-                break;
-            case agoraCreator.AGORAEVT.evt_jSuccess:
-                this.loadScene2();
-                break;
-        }
-    },
-
-    loadScene2:function() {
+    onJoinChannelSuccess:function(channel, uid, elapsed){
+        cc.log("Join Channel Success, channel: " + channel + " uid: " + uid + " elapsed: " + elapsed);
         cc.director.loadScene("scene2");
+    },
+
+    addTips:function(args){
+         this.msgLabel.string  = args;
     },
 
     toggle1Func:function(){
         this.profileRole = 0;
-        agoraCreator.agoraCreatorInst.setChannelProfile(this.profileRole);
-        agoraCreator.addTips("setChannelProfile: " +  "communication "); 
+        agora.setChannelProfile(this.profileRole);
+        this.addTips("setChannelProfile: " +  "communication "); 
     },
 
     toggle2Func:function(){
         this.profileRole = 1;
-        agoraCreator.agoraCreatorInst.setChannelProfile(this.profileRole);
-        agoraCreator.agoraCreatorInst.setClientRole(1);
+        agora.setChannelProfile(this.profileRole);
+        agora.setClientRole(1);
 
-        agoraCreator.addTips("setChannelProfile: " +  " Broadcast + Host "); 
+        this.addTips("setChannelProfile: " +  " Broadcast + Host "); 
     },
 
     toggle3Func:function(){
         this.profileRole = 2;
-        agoraCreator.agoraCreatorInst.setChannelProfile(this.profileRole -1 );
-        agoraCreator.agoraCreatorInst.setClientRole(this.profileRole);
-        agoraCreator.addTips("setChannelProfile: " + " Broadcast + Audience "); 
+        agora.setChannelProfile(this.profileRole -1 );
+        agora.setClientRole(this.profileRole);
+        this.addTips("setChannelProfile: " + " Broadcast + Audience "); 
     },
 
     setDefaultAudioRouteToSpeakerphone:function(){
         if(!this.bDefaultSpeakerphone){
             this.bDefaultSpeakerphone = !this.bDefaultSpeakerphone;
-            agoraCreator.addTips("setDefaultAudioRouteToSpeakerphone: " + this.bDefaultSpeakerphone);                
+            this.addTips("setDefaultAudioRouteToSpeakerphone: " + this.bDefaultSpeakerphone);                
         } else {
             this.bDefaultSpeakerphone = !this.bDefaultSpeakerphone;
-            agoraCreator.addTips("setDefaultAudioRouteToSpeakerphone: " + this.bDefaultSpeakerphone);            
+            this.addTips("setDefaultAudioRouteToSpeakerphone: " + this.bDefaultSpeakerphone);            
         }
-        agoraCreator.agoraCreatorInst.setDefaultAudioRouteToSpeakerphone(this.bDefaultSpeakerphone);
+        agora.setDefaultAudioRouteToSpeakerphone(this.bDefaultSpeakerphone);
     },
 
     enableAudioVolumeIndication:function(){
         var interval = 800;
         var smooth = 3;
-        agoraCreator.addTips("enableAudioVolumeIndication(" + interval +", "+ smooth + ")" );            
-        agoraCreator.agoraCreatorInst.enableAudioVolumeIndication(800, 3);
+        this.addTips("enableAudioVolumeIndication(" + interval +", "+ smooth + ")" );            
+        agora.enableAudioVolumeIndication(800, 3);
     },
 
     createEngine: function (event, customEventData) {
-        agoraCreator.createEngine("4c51ad802859440cbfb89eb75919d9ed");// input: APPID
-        console.log("Debug, agoraCreator.createEngine ");
+        // agoraCreator.createEngine("4c51ad802859440cbfb89eb75919d9ed");// input: APPID
+        // input: APPID
+        agora.init("4c51ad802859440cbfb89eb75919d9ed");
+        this.sdkVer.string =  "sdkVer: " + agora.getVersion();
+        this.updateUI(true);
+
     },
 
     joinChannel: function (event, customEventData) {
@@ -175,7 +146,7 @@ cc.Class({
         var channelId = this.cEditBox.string;
 
         if(channelId == ""){
-            agoraCreator.addTips("channelId is null."); 
+            this.addTips("channelId is null."); 
             cc.log("channelId is ''");
             return false;
         }else {
@@ -193,13 +164,13 @@ cc.Class({
         var token = "";
         var uid = 0;
         var info = "";
-        if(agoraCreator.agoraCreatorInst == null){
+        if(agora == null){
             cc.log("agoraCreatorInst should be not null.");
             return false;
         }else {
             cc.log("agoraCreatorInst is not null.");
         }
-        agoraCreator.agoraCreatorInst.joinChannel(token, channelId, info, uid);
+        agora.joinChannel(token, channelId, info, uid);
     },
 
     start(){
@@ -207,8 +178,6 @@ cc.Class({
 
     update(){
 
-    }
+    },
 
 });
-
-
