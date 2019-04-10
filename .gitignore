@@ -53,9 +53,6 @@ quick_gen_project_*_autogen.bat.meta
 quick_gen_project_*_autogen.sh
 quick_gen_project_*_autogen.sh.meta
 .exvim.app
-assets/Script/*.meta
-assets/*.meta
-assets/textures/background/*.meta
 
 #/////////////////////////////////////////////////////////////////////////////
 # webstorm files
@@ -74,3 +71,10 @@ assets/textures/background/*.meta
 # Agora SDK
 #//////////////////////////
 agoraCreatorSDK/libs
+
+#//////////////////////////
+# CocosCreator Service
+#//////////////////////////
+assets/agora*
+settings/services.json 
+packages/

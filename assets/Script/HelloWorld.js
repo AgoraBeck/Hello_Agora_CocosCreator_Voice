@@ -1,4 +1,4 @@
-
+require("js-agora");
 cc.Class({
     extends: cc.Component,
 
@@ -62,6 +62,8 @@ cc.Class({
         profileRole:0,
 
         bDefaultSpeakerphone:false,
+        
+        agoraAppID:"YOUR_AGORA_APPID",
     },
 
     onLoad: function () {        
@@ -86,7 +88,7 @@ cc.Class({
 
     onJoinChannelSuccess:function(channel, uid, elapsed){
         cc.log("Join Channel Success, channel: " + channel + " uid: " + uid + " elapsed: " + elapsed);
-        cc.director.loadScene("scene2");
+        cc.director.loadScene("Scene2");
     },
 
     addTips:function(args){
@@ -133,12 +135,11 @@ cc.Class({
     },
 
     createEngine: function (event, customEventData) {
-        // agoraCreator.createEngine("4c51ad802859440cbfb89eb75919d9ed");// input: APPID
-        // input: APPID
-        agora.init("4c51ad802859440cbfb89eb75919d9ed");
+        // input: APPID. 
+        console.log("Your private agoraAppID:", this.agoraAppID);
+        agora.init(this.agoraAppID);
         this.sdkVer.string =  "sdkVer: " + agora.getVersion();
         this.updateUI(true);
-
     },
 
     joinChannel: function (event, customEventData) {

@@ -1,4 +1,4 @@
-
+require("js-agora");
 cc.Class({
     extends: cc.Component,
 
